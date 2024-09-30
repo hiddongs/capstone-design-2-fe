@@ -2,26 +2,6 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:8080'; // 백엔드 API 주소
 
-// 네이버 로그인
-export function loginWithNaver() {
-  return axios.get(`${API_BASE_URL}/login/naver`)
-    .then(response => response.data)
-    .catch(error => {
-      console.error("네이버 로그인 에러:", error);
-      throw error;
-    });
-}
-
-// 카카오 로그인
-export function loginWithKakao() {
-  return axios.get(`${API_BASE_URL}/login/kakao`)
-    .then(response => response.data)
-    .catch(error => {
-      console.error("카카오 로그인 에러:", error);
-      throw error;
-    });
-}
-
 // 로그인한 사용자 정보 가져오기
 export function getUserInfo() {
   return axios.get(`${API_BASE_URL}/user/info`)
@@ -61,16 +41,6 @@ export function loginUser(userData) {
       throw error;
     });
 }
-// src/services/authService.js
-export function getNaverLoginUrl() {
-  const clientId = '네이버 클라이언트 ID';
-  const redirectUri = encodeURIComponent('http://localhost:8080/login/callback/naver');
-  const state = 'RANDOM_STATE_STRING'; // CSRF 방지를 위한 상태 값
-  return `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&state=${state}`;
-}
 
-export function getKakaoLoginUrl() {
-  const clientId = '카카오 클라이언트 ID';
-  const redirectUri = encodeURIComponent('http://localhost:8080/login/callback/kakao');
-  return `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
-}
+// 기존 네이버 및 카카오 로그인 관련 코드는 더 이상 필요 없음
+// 백엔드에서 리디렉션 처리하므로 해당 메서드 삭제

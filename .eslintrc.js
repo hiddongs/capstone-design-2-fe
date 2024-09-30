@@ -13,6 +13,8 @@ module.exports = {
     sourceType: 'module' // 모듈을 사용하도록 설정
   },
   rules: {
-    // 사용자 정의 규칙 설정
+    
+      'vue/multi-word-component-names': 'off',
+    
   }
 };
