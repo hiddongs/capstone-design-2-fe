@@ -9,12 +9,14 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
     "axios": "^1.7.7",
     "axios-mock-adapter": "^2.0.0",
     "core-js": "^3.6.5",
     "tailwindcss": "^3.4.10",
     "vue": "^3.5.8",
-    "vue-router": "^4.0.13"
+    "vue-router": "^4.0.13",
+    "webpack": "^5.95.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

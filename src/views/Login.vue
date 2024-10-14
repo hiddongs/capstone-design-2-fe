@@ -3,14 +3,14 @@
     <div class="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
       <h2 class="text-center text-2xl font-semibold mb-6 text-gray-700">로그인</h2>
       <div class="space-y-4">
-        <!-- 이메일 입력 -->
+        <!-- 사용자명 입력 -->
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">이메일</label>
+          <label for="username" class="block text-sm font-medium text-gray-700">사용자명</label>
           <input
-            v-model="email"
-            type="email"
-            id="email"
-            placeholder="이메일을 입력하세요"
+            v-model="username"
+            type="text"
+            id="username"
+            placeholder="사용자명을 입력하세요"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
@@ -65,33 +65,62 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  name: 'UserLogin',
+  name: 'Login',
   data() {
     return {
-      email: '',
-      password: '',
-      errorMessage: '',
+      username: '', // 사용자명
+      password: '', // 비밀번호
+      errorMessage: '', // 에러 메시지
     };
   },
   methods: {
-    // 일반 로그인 로직
+    // 로그인 로직
     async login() {
-      if (this.email === 'yhd1227@naver.com' && this.password === '1234') {
+      try {
+        const response = await axios.post('http://localhost:8080/api/auth/login', {
+          username: this.username,
+          password: this.password,
+        });
+
+        // 로그인 성공 시 에러 메시지 초기화 및 저장
         this.errorMessage = '';
         alert('로그인 성공!');
-      } else {
-        this.errorMessage = '이메일 또는 비밀번호가 잘못되었습니다.';
+
+        // 로그인 성공 후 응답에서 받은 토큰 및 데이터를 저장
+        localStorage.setItem('accessToken', response.data.accessToken);  // AccessToken 저장
+        localStorage.setItem('userId', response.data.userId);  // User ID 저장
+
+        // 대시보드로 리디렉션
+        this.$router.push('/dashboard');
+      } catch (error) {
+        // 오류 처리
+        if (error.response && error.response.status === 401) {
+          // 인증 오류
+          this.errorMessage = '사용자명 또는 비밀번호가 잘못되었습니다.';
+        } else if (error.response && error.response.status === 404) {
+          // 잘못된 경로 또는 자원 없음
+          this.errorMessage = '서버에 문제가 발생했습니다. 요청한 페이지를 찾을 수 없습니다.';
+        } else {
+          // 서버 오류
+          this.errorMessage = '서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        }
+        console.error('로그인 오류:', error);
       }
     },
+    
     // 네이버 로그인
     loginWithNaver() {
       window.location.href = 'http://localhost:8080/login/naver'; // 백엔드 네이버 로그인 엔드포인트
     },
+    
     // 카카오 로그인
     loginWithKakao() {
       window.location.href = 'http://localhost:8080/login/kakao'; // 백엔드 카카오 로그인 엔드포인트
     },
+    
     // 회원가입 페이지로 이동
     goToSignUp() {
       this.$router.push('/signup');
@@ -99,14 +128,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.login-container {
-  max-width: 400px;
-  margin: auto;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  border-radius: 8px;
-}
-</style>
