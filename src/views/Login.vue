@@ -92,6 +92,9 @@ export default {
         // 로그인 성공 후 응답에서 받은 토큰 및 데이터를 저장
         localStorage.setItem('accessToken', response.data.accessToken);  // AccessToken 저장
         localStorage.setItem('userId', response.data.userId);  // User ID 저장
+        localStorage.setItem('username', this.username); // 사용자명 저장
+
+        console.log(response.data);
 
         // 대시보드로 리디렉션
         this.$router.push('/dashboard');
