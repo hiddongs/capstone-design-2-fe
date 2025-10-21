@@ -1,56 +1,60 @@
 <template>
-    <div>
-      <h1 class="text-2xl font-bold mb-4">방문 예약</h1>
-      <form @submit.prevent="submitBooking">
-        <div class="mb-4">
-          <label for="hospital" class="block text-sm font-medium">병원 선택</label>
-          <select v-model="selectedHospital" id="hospital" class="w-full p-2 border rounded">
-            <option v-for="hospital in hospitals" :key="hospital.id" :value="hospital">{{ hospital.name }}</option>
-          </select>
-        </div>
-  
-        <div class="mb-4">
-          <label for="date" class="block text-sm font-medium">예약 날짜</label>
-          <input type="date" v-model="bookingDate" id="date" class="w-full p-2 border rounded" />
-        </div>
-  
-        <div class="mb-4">
-          <label for="time" class="block text-sm font-medium">예약 시간</label>
-          <input type="time" v-model="bookingTime" id="time" class="w-full p-2 border rounded" />
-        </div>
-  
-        <button type="submit" class="py-2 px-4 bg-primary text-white rounded-lg">예약하기</button>
-      </form>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        hospitals: [
-          { id: 1, name: '서울병원' },
-          { id: 2, name: '강남성심병원' },
-          { id: 3, name: '삼성서울병원' }
-        ],
-        selectedHospital: null,
-        bookingDate: '',
-        bookingTime: ''
+  <div class="p-6">
+    <h1 class="text-2xl font-bold mb-4">🗺 네이버 지도 예제</h1>
+
+    <!-- 지도 -->
+    <div id="map" class="w-full h-[500px] border rounded-lg"></div>
+  </div>
+</template>
+
+<script>
+/* global naver */
+export default {
+  name: "BookingView",
+  mounted() {
+    // 네이버 지도 스크립트 로드
+   const script = document.createElement("script");
+   script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${import.meta.env.VITE_NAVER_CLIENT_ID}`;
+   script.async = true;
+   script.onload = this.initMap;
+   document.head.appendChild(script);
+
+  },
+  methods: {
+    // 지도 초기화 
+    initMap() {
+      const mapOptions = {
+        center: new naver.maps.LatLng(37.3595704, 127.105399), // 판교 네이버 본사 좌표
+        zoom: 10,
+        mapTypeControl: true,
       };
+
+      const map = new naver.maps.Map("map", mapOptions);
+
+      // ✅ 마커 예제 (공식 가이드 참고)
+      const marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(37.3595704, 127.105399),
+        map,
+        title: "NAVER 본사",
+      });
+
+      const infoWindow = new naver.maps.InfoWindow({
+        content:
+          '<div style="padding:8px;font-size:14px;">📍 네이버 본사<br>경기도 성남시 분당구 불정로 6</div>',
+      });
+
+      naver.maps.Event.addListener(marker, "click", function () {
+        infoWindow.open(map, marker);
+      });
     },
-    methods: {
-      submitBooking() {
-        if (!this.selectedHospital || !this.bookingDate || !this.bookingTime) {
-          alert('모든 항목을 입력하세요.');
-          return;
-        }
-        alert(`예약 완료: ${this.selectedHospital.name}, 날짜: ${this.bookingDate}, 시간: ${this.bookingTime}`);
-        // 실제로는 API를 호출하여 예약 데이터를 서버로 전송
-      }
-    }
-  };
-  </script>
-  
-  <style scoped>
-  /* 스타일 정의 */
-  </style>
+  },
+};
+</script>
+
+<style scoped>
+#map {
+  width: 100%;
+  height: 500px;
+  border-radius: 10px;
+}
+</style>
