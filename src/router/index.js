@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Dashboard from '@/views/DashBoard.vue';
-import Booking from '@/views/Booking.vue';
+
+
 import Info from '@/views/Info.vue';
 import QnA from '@/views/QnA.vue';
 import AIChat from '@/views/AIChat.vue';
@@ -10,6 +11,8 @@ import Board from '@/views/Board.vue';
 import BoardList from '@/views/BoardList.vue';
 import BoardDetail from '@/views/BoardDetail.vue';
 import BookingList from '@/views/BookingList.vue';
+import DashboardHome from '@/views/DashboardHome.vue';
+import DiagnosisHistory from "@/views/DiagnosisHistory.vue";
 
 const routes = [
   {
@@ -31,8 +34,9 @@ const routes = [
     path: '/dashboard',
     component: Dashboard,
     children: [
-      { path: 'booking', name: 'Booking', component: Booking },
+      
       { path: 'booking-list', name: 'BookingList', component: BookingList },
+      { path: "home", name: 'DashboardHomeVue', component: DashboardHome },
       { path: 'info', name: 'Info', component: Info },
       { path: 'qna', name: 'QnA', component: QnA },
       { path: 'ai-chat', name: 'AIChat', component: AIChat },
@@ -41,6 +45,29 @@ const routes = [
       { path: 'board', name: 'Board', component: Board },
       { path: 'board-list', name: 'BoardList', component: BoardList },
       { path: 'board/:boardId', name: 'BoardDetail', component: BoardDetail },
+      { path: 'history', name: 'DiagnosisHistory', component: DiagnosisHistory },
+      {
+  path: "telemedicine/:dept",
+  name: "TelemedicinePage",
+  component: () =>
+    import("@/views/TelemedicinePage.vue"),
+  props: true,
+},
+{
+  path: "telemedicine/:dept/form",
+  name: "TelemedicineForm",
+  component: () => import("@/views/TelemedicineForm.vue"),
+  props: true,
+},
+{
+  path: "telemedicine/result",
+  name: "TelemedicineResult",
+  component: () => import("@/views/TelemedicineResult.vue"),
+},
+
+
+
+
     ],
   },
 ];
