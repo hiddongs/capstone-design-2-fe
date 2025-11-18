@@ -4,6 +4,7 @@
     <h2 class="text-3xl font-bold mb-6">📝 AI 문진</h2>
 
     <div class="bg-white p-6 rounded-2xl shadow">
+
       <!-- 질문 -->
       <p class="text-xl font-semibold mb-4">{{ currentQuestion.question }}</p>
 
@@ -27,23 +28,38 @@
         </button>
       </div>
 
-      <!-- button -->
-      <button
-        class="mt-6 w-full py-3 bg-sky-600 text-white text-lg rounded-lg"
-        @click="nextQuestion"
-        v-if="currentIndex < questions.length - 1"
-      >
-        다음 →
-      </button>
+      <!-- 버튼 영역 -->
+      <div class="mt-6 flex gap-3">
 
-      <!-- finish -->
-      <button
-        class="mt-6 w-full py-3 bg-green-600 text-white text-lg rounded-lg"
-        @click="finishForm"
-        v-else
-      >
-        문진 완료하기
-      </button>
+        <!-- 뒤로가기 버튼 (첫 질문 제외) -->
+        <button
+          v-if="currentIndex > 0"
+          class="flex-1 py-3 bg-gray-300 text-black rounded-lg"
+          @click="prevQuestion"
+        >
+          ← 이전
+        </button>
+
+        <!-- 다음 버튼 -->
+        <button
+          v-if="currentIndex < questions.length - 1"
+          class="flex-1 py-3 bg-sky-600 text-white text-lg rounded-lg"
+          @click="nextQuestion"
+        >
+          다음 →
+        </button>
+
+        <!-- 완료 버튼 -->
+        <button
+          v-else
+          class="flex-1 py-3 bg-green-600 text-white text-lg rounded-lg"
+          @click="finishForm"
+        >
+          문진 완료하기
+        </button>
+
+      </div>
+
     </div>
 
   </div>
@@ -60,7 +76,6 @@ export default {
     return {
       currentIndex: 0,
       answers: {},
-      // 기본 문진 질문 세트
       baseQuestions: [
         { question: "언제부터 증상이 시작되었나요?", type: "text" },
         {
@@ -84,7 +99,6 @@ export default {
     },
 
     questions() {
-      // 필요 시 진료과별 추가 질문을 merge할 수도 있음
       return this.baseQuestions;
     },
 
@@ -94,7 +108,21 @@ export default {
   },
 
   methods: {
+
+    // ✔ 이전 문항으로 이동
+    prevQuestion() {
+      this.currentIndex--;
+    },
+
+    // ✔ 다음 문항으로 이동하기 전에 빈칸 체크
     nextQuestion() {
+      const currentAnswer = this.answers[this.currentIndex];
+
+      if (!currentAnswer || currentAnswer.trim() === "") {
+        alert("답변을 입력해야 다음으로 진행할 수 있습니다.");
+        return;
+      }
+
       this.currentIndex++;
     },
 
@@ -103,29 +131,38 @@ export default {
       this.nextQuestion();
     },
 
+    // ✔ 최종 제출 전 전체 검증
     async finishForm() {
-      const result = {
-        userId: localStorage.getItem("userId"),
+      for (let i = 0; i < this.questions.length; i++) {
+        if (!this.answers[i] || this.answers[i].trim() === "") {
+          alert("모든 질문에 답변해야 문진을 완료할 수 있습니다.");
+          return;
+        }
+      }
+
+      const payload = {
+        userId: Number(localStorage.getItem("userId")),
+
         department: this.dept,
         departmentName: this.deptInfo.name,
         answers: this.questions.map((q, i) => ({
           question: q.question,
-          answer: this.answers[i] || "",
+          answer: this.answers[i],
         })),
-        createdAt: new Date().toISOString(),
       };
 
-      // 백엔드 전송
-      await fetch("http://localhost:8081/api/triage/submit", {
+      const response = await fetch("http://localhost:8080/api/triage/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result),
+        body: JSON.stringify(payload),
       });
 
-      // 결과 페이지로 이동
+      const data = await response.json();
+
+      // 결과 페이지 이동
       this.$router.push({
         name: "TelemedicineResult",
-        state: { summary: result },
+        state: { summary: data },
       });
     },
   },

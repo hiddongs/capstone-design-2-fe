@@ -1,141 +1,207 @@
 <template>
-  <div>
-    <!-- Hero Section -->
-    <div class="hero bg-fixed bg-center animate__animated animate__fadeIn" style="background-image: url('../assets/medi.jpg');">
-      <div class="text-center hero-content">
-        <h1 class="text-6xl font-bold text-white animate__animated animate__fadeInDown">AI 기반 비대면 진료</h1>
-        <p class="py-10 text-xl text-gray-300 animate__animated animate__fadeInUp">인공지능을 기반으로 한 비대면 진료 시스템</p>
-        <router-link to="/login">
-          <button class="btn btn-primary px-8 py-4 rounded-lg text-lg hover:animate__pulse">로그인 하러가기</button>
-        </router-link>
-      </div>
-    </div>
+  <div class="min-h-screen bg-gray-50">
 
-    <!-- Services Section -->
-    <section class="section mt-10 p-8 bg-gray-100">
-      <h2 class="text-center text-4xl mb-6 font-semibold text-gray-800 animate__animated animate__fadeIn">서비스</h2>
-      <p class="text-center max-w-2xl mx-auto mb-10 text-lg text-gray-600 animate__animated animate__fadeInUp">
-        고객들을 충족시키기 위한 더욱 혁신적인 진료 시스템
-        자세한 사항은 서비스를 참고하세요!
+    <!-- HERO SECTION -->
+    <section class="relative overflow-hidden h-[85vh] flex items-center justify-center">
+      
+      <!-- Background -->
+      <img
+        :src="heroImage"
+        class="absolute inset-0 w-full h-full object-cover opacity-60"
+      />
+
+      <!-- Gradient Overlay -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70"></div>
+
+      <!-- Text -->
+      <div
+        class="relative z-10 text-center max-w-3xl px-6"
+        data-aos="fade-up"
+      >
+        <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-xl leading-tight">
+          AI 비대면 진료 서비스
+        </h1>
+
+        <p class="text-xl text-gray-200 mt-6">
+          인공지능 기반 실시간 분석과 전문 의사의 검진을 한 곳에서
+        </p>
+
+        <div class="mt-10 flex justify-center space-x-4">
+          <router-link to="/login">
+            <button class="px-8 py-3 text-lg bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-xl transition">
+              로그인
+            </button>
+          </router-link>
+
+          <router-link to="/signup">
+            <button class="px-8 py-3 text-lg bg-white/90 backdrop-blur text-sky-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition shadow">
+              회원가입
+            </button>
+          </router-link>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- FEATURES SECTION -->
+    <section class="max-w-7xl mx-auto px-6 py-24">
+      <h2 class="text-4xl font-bold text-center text-gray-800 mb-4" data-aos="fade-up">
+        주요 기능
+      </h2>
+
+      <p class="text-center text-gray-600 mb-14" data-aos="fade-up">
+        알약크루가 제공하는 핵심 기능들을 만나보세요
       </p>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <!-- 서비스 1 -->
-        <div class="bg-white p-6 shadow-lg rounded-lg hover:shadow-xl transition-shadow animate__animated animate__zoomIn">
-          <img src="../assets/ai_healthcare.jpg" alt="AI Healthcare" class="mx-auto h-40 w-40 rounded-full mb-4" />
-          <h3 class="text-xl font-bold text-gray-700 mb-2">인공지능 건강 관리</h3>
-          <p class="text-gray-600">AI를 통한 맞춤형 의료 지원</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        <!-- Feature Card -->
+        <div
+          v-for="(f, index) in features"
+          :key="index"
+          class="bg-white/80 backdrop-blur shadow-md rounded-2xl p-10 hover:shadow-xl transition border border-gray-100"
+          data-aos="fade-up"
+          :data-aos-delay="index * 200"
+        >
+          <img :src="f.img" class="w-24 h-24 mx-auto rounded-xl mb-6 shadow" />
+          <h3 class="text-2xl font-semibold text-gray-700 text-center mb-2">{{ f.title }}</h3>
+          <p class="text-gray-600 text-center">{{ f.desc }}</p>
         </div>
 
-        <!-- 서비스 2 -->
-        <div class="bg-white p-6 shadow-lg rounded-lg hover:shadow-xl transition-shadow animate__animated animate__zoomIn" style="animation-delay: 0.1s;">
-          <img src="../assets/remote_consultation.jpg" alt="Remote Consultation" class="mx-auto h-40 w-40 rounded-full mb-4" />
-          <h3 class="text-xl font-bold text-gray-700 mb-2">원격 상담</h3>
-          <p class="text-gray-600">원격 상담을 통해 집에서도 간편하게 진료를 받을 수 있습니다!</p>
-        </div>
+      </div>
+    </section>
 
-        <!-- 서비스 3 -->
-        <div class="bg-white p-6 shadow-lg rounded-lg hover:shadow-xl transition-shadow animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
-          <img src="../assets/medical_reports.jpg" alt="Medical Reports" class="mx-auto h-40 w-40 rounded-full mb-4" />
-          <h3 class="text-xl font-bold text-gray-700 mb-2">진단서</h3>
-          <p class="text-gray-600">진단서를 더욱 쉽게 확인할 수 있습니다!</p>
+
+    <!-- Stats Section -->
+    <section class="bg-gradient-to-r from-sky-500 to-blue-600 text-white py-24">
+      <div class="max-w-7xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-center mb-14" data-aos="fade-up">서비스 성과</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+          <div
+            v-for="(s, index) in stats"
+            :key="index"
+            class="p-6"
+            data-aos="fade-up"
+            :data-aos-delay="index * 200"
+          >
+            <p class="text-5xl font-extrabold">{{ s.value }}</p>
+            <p class="text-lg mt-2 opacity-90">{{ s.label }}</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="mt-20 p-10 bg-white">
-      <h2 class="text-center text-4xl font-semibold text-gray-800 mb-12 animate__animated animate__fadeIn">환자의 목소리</h2>
 
-      <div class="flex flex-col md:flex-row justify-around items-center space-y-8 md:space-y-0 md:space-x-8">
-        <!-- 환자 후기 1 -->
-        <div class="text-center max-w-xs animate__animated animate__fadeInLeft">
-          <img src="../assets/patient1.jpg" alt="Patient 1" class="rounded-full h-24 w-24 mx-auto mb-4" />
-          <p class="italic text-gray-600">인공지능을 통한 원격 진료 시스템은 제 증산을 빠르게 확인하고 간편하게 의사에게 확인 받게 했습니다!</p>
-          <p class="mt-4 font-semibold text-gray-700">Joe Danny</p>
+    <!-- Reviews Section -->
+    <section class="max-w-7xl mx-auto px-6 py-24">
+      <h2 class="text-4xl font-bold text-center mb-14 text-gray-800" data-aos="fade-up">
+        실제 후기
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        <div
+          v-for="(r, index) in reviews"
+          :key="index"
+          class="bg-white shadow-md rounded-2xl p-8 text-center hover:shadow-xl transition"
+          data-aos="fade-up"
+          :data-aos-delay="index * 250"
+        >
+          <img :src="r.img" class="w-20 h-20 rounded-full mx-auto mb-4 shadow" />
+          <p class="text-gray-600 italic">“{{ r.text }}”</p>
+          <p class="mt-4 font-semibold">{{ r.name }}</p>
         </div>
 
-        <!-- 환자 후기 2 -->
-        <div class="text-center max-w-xs animate__animated animate__fadeInUp">
-          <img src="../assets/patient2.jpg" alt="Patient 2" class="rounded-full h-24 w-24 mx-auto mb-4" />
-          <p class="italic text-gray-600">"의사들이 실시간으로 빠르게 상담해주니 진단이 편리했습니다!""</p>
-          <p class="mt-4 font-semibold text-gray-700">- John Smith</p>
-        </div>
-
-        <!-- 환자 후기 3 -->
-        <div class="text-center max-w-xs animate__animated animate__fadeInRight">
-          <img src="../assets/patient3.jpg" alt="Patient 3" class="rounded-full h-24 w-24 mx-auto mb-4" />
-          <p class="italic text-gray-600">"진단서를 가져오는 것이 너무 쉽고 시간 절약이 좋습니다!""</p>
-          <p class="mt-4 font-semibold text-gray-700">- Sarah Lee</p>
-        </div>
       </div>
     </section>
 
-    <!-- Call to Action Section -->
-    <section class="bg-blue-600 py-20 text-white text-center animate__animated animate__fadeInUp">
-      <h2 class="text-4xl font-semibold mb-6">시작할까요?</h2>
-      <p class="text-lg mb-10">우리의 웹을 선호하는 수천명의 환자들과 함께하기!</p>
+
+    <!-- CTA -->
+    <section class="bg-gray-900 py-24 text-center text-white">
+      <h2 class="text-4xl font-bold mb-4" data-aos="fade-up">지금 바로 시작하세요</h2>
+      <p class="text-lg text-gray-300 mb-10" data-aos="fade-up" data-aos-delay="200">
+        병원 갈 시간이 부족한 현대인을 위한 의료 서비스
+      </p>
+
       <router-link to="/signup">
-        <button class="btn btn-light px-10 py-4 text-lg rounded-lg hover:animate__pulse">지금 가입하기</button>
+        <button
+          class="px-12 py-4 bg-sky-500 hover:bg-sky-600 rounded-xl text-lg font-semibold shadow-xl transition"
+          data-aos="zoom-in"
+        >
+          회원가입 →
+        </button>
       </router-link>
     </section>
+
   </div>
 </template>
 
 <script>
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 export default {
+  name: "Home",
+
+  mounted() {
+    AOS.init({
+      duration: 800,
+      easing: "ease-out-quart",
+      once: true,
+    });
+  },
+
   data() {
     return {
-      backgroundImage: require('@/assets/medi.jpg')
-    }
-  }
-}
+      heroImage: require("@/assets/medi.jpg"),
+
+      features: [
+        {
+          img: require("@/assets/ai_healthcare.jpg"),
+          title: "AI 건강 분석",
+          desc: "증상 분석, 질병 가능성 안내",
+        },
+        {
+          img: require("@/assets/remote_consultation.jpg"),
+          title: "원격 화상 진료",
+          desc: "의료진과 실시간 상담 가능",
+        },
+        {
+          img: require("@/assets/medical_reports.jpg"),
+          title: "진단서 관리",
+          desc: "기록 및 진단서 보관 기능",
+        },
+      ],
+
+      stats: [
+        { value: "98%", label: "사용자 만족도" },
+        { value: "24/7", label: "AI 진료 사용 가능" },
+        { value: "30만+", label: "누적 상담량" },
+      ],
+
+      reviews: [
+        {
+          img: require("@/assets/patient1.jpg"),
+          text: "AI 분석 덕분에 빠르게 진료 받을 수 있었어요.",
+          name: "박지현",
+        },
+        {
+          img: require("@/assets/patient2.jpg"),
+          text: "진단서 발급도 쉬워서 편하게 이용했습니다.",
+          name: "김성훈",
+        },
+        {
+          img: require("@/assets/patient3.jpg"),
+          text: "비대면 진료의 새로운 기준을 만든 서비스!",
+          name: "신은지",
+        },
+      ],
+    };
+  },
+};
 </script>
 
 <style scoped>
-.hero {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  overflow: hidden;
-}
-
-.hero-content {
-  color: #fff;
-  text-shadow: 0px 0px 10px #000;
-}
-
-.section {
-  padding: 3rem 0;
-}
-
-.btn-primary {
-  background-color: #4f46e5;
-  color: white;
-}
-
-.btn-light {
-  background-color: #fff;
-  color: #4f46e5;
-  border: 2px solid #4f46e5;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-
-.text-gray-600 {
-  color: #4a5568;
-}
-
-.text-gray-700 {
-  color: #2d3748;
-}
-
-.bg-blue-600 {
-  background-color: #2563eb;
-}
 </style>

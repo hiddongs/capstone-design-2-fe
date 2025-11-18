@@ -64,10 +64,15 @@ const routes = [
   name: "TelemedicineResult",
   component: () => import("@/views/TelemedicineResult.vue"),
 },
-
-
-
-
+{
+  path: '/dashboard/mypage',
+  component: () => import('@/views/UserMyPage.vue'),
+},
+{
+  path: 'doctor-apply',
+  name: 'DoctorApply',
+  component: () => import('@/views/DoctorApply.vue'),
+},
     ],
   },
 ];
@@ -77,7 +82,7 @@ const router = createRouter({
   routes,
 });
 
-// ✅ 로그인 상태 체크
+//  로그인 상태 체크
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('accessToken');
   console.log('to:', to.path, 'name:', to.name, 'token:', token);

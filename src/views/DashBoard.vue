@@ -1,64 +1,97 @@
 <template>
-  <div class="min-h-screen flex bg-gray-50">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-md p-6">
-      <h2 class="text-2xl font-bold text-sky-600">대시보드</h2>
+  <div class="min-h-screen flex bg-gray-50 justify-center">
 
-      <nav class="mt-8 space-y-2">
-        <router-link to="/dashboard/home"
-          class="block py-2 px-4 rounded hover:bg-sky-500 hover:text-white">
-          🏠 홈
-        </router-link>
+    <!-- 전체 래퍼 -->
+    <div class="flex w-full max-w-7xl">
 
-        <router-link to="/dashboard/info"
-          class="block py-2 px-4 rounded hover:bg-sky-500 hover:text-white">
-          🏥 병원 검색
-        </router-link>
+      <!-- Sidebar -->
+      <aside class="w-72 bg-white shadow-xl p-8 rounded-r-2xl">
+        <h2 class="text-3xl font-extrabold text-sky-600 tracking-tight">
+          대시보드
+        </h2>
 
-        <router-link to="/dashboard/qna"
-          class="block py-2 px-4 rounded hover:bg-sky-500 hover:text-white">
-          💬 실시간 Q&A
-        </router-link>
+        <nav class="mt-10 space-y-3 text-lg">
 
-        <router-link to="/dashboard/ai-chat"
-          class="block py-2 px-4 rounded hover:bg-sky-500 hover:text-white">
-          🤖 AI 채팅
-        </router-link>
-
-        <!-- 비대면 진료 -->
-        <div>
-          <button
-            @click="toggleTele"
-            class="w-full text-left py-2 px-4 rounded hover:bg-sky-500 hover:text-white flex justify-between items-center"
+          <!-- 마이페이지 -->
+          <router-link
+            to="/dashboard/mypage"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
           >
-            <span>💻 비대면 진료</span>
-            <span>{{ teleOpen ? "▲" : "▼" }}</span>
-          </button>
+            👤 마이페이지
+          </router-link>
 
-          <!-- 슬라이드 애니메이션 -->
-          <transition name="slide">
-            <div
-              v-if="teleOpen"
-              class="ml-4 mt-1 space-y-1"
+          <router-link
+            to="/dashboard/home"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            🏠 홈
+          </router-link>
+
+          <router-link
+            to="/dashboard/info"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            🏥 병원 검색
+          </router-link>
+
+          <router-link
+            to="/dashboard/qna"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            💬 실시간 Q&A
+          </router-link>
+
+          <router-link
+            to="/dashboard/ai-chat"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            🤖 AI 채팅
+          </router-link>
+
+          <router-link
+            to="/dashboard/disease-encyclopedia"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            📚 질병 백과사전
+          </router-link>
+
+          <!-- 비대면 진료 드롭다운 -->
+          <div>
+            <button
+              @click="toggleTele"
+              class="w-full text-left py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition flex justify-between items-center"
             >
-              <router-link
-                v-for="dept in departments"
-                :key="dept.name"
-                :to="dept.route"
-                class="block py-1 px-3 text-sm rounded hover:bg-sky-400 hover:text-white"
-              >
-                • {{ dept.name }}
-              </router-link>
-            </div>
-          </transition>
-        </div>
-      </nav>
-    </aside>
+              <span>💻 비대면 진료</span>
+              <span>{{ teleOpen ? "▲" : "▼" }}</span>
+            </button>
 
-    <!-- Main content -->
-    <main class="flex-1 p-8">
-      <router-view />
-    </main>
+            <transition name="slide">
+              <div
+                v-if="teleOpen"
+                class="ml-4 mt-2 space-y-2"
+              >
+                <router-link
+                  v-for="dept in departments"
+                  :key="dept.name"
+                  :to="dept.route"
+                  class="block py-2 px-4 text-base rounded-lg hover:bg-sky-400 hover:text-white transition"
+                >
+                  • {{ dept.name }}
+                </router-link>
+              </div>
+            </transition>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-10 flex justify-center">
+        <div class="w-full max-w-5xl">
+          <router-view />
+        </div>
+      </main>
+
+    </div>
   </div>
 </template>
 
@@ -84,7 +117,6 @@ export default {
       ],
     };
   },
-
   methods: {
     toggleTele() {
       this.teleOpen = !this.teleOpen;
@@ -96,12 +128,11 @@ export default {
 <style>
 .slide-enter-active,
 .slide-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
-
 .slide-enter-from,
 .slide-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-8px);
 }
 </style>
