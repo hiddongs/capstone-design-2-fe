@@ -1,11 +1,29 @@
 <template>
   <div class="max-w-6xl mx-auto py-10 px-4">
 
+    <!-- ⭐ 안내 박스 -->
+    <div class="mb-6 p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
+      <h2 class="text-xl font-bold text-blue-700 flex items-center gap-2">
+        📘 질병 백과사전 안내
+      </h2>
+
+      <p class="text-blue-700 mt-2 leading-relaxed">
+        이 페이지에서는 다양한 질환의 <strong>정의, 증상, 원인, 치료 방법</strong>을 검색하고 확인할 수 있습니다.<br />
+        상단 검색창에서 질병명을 입력하거나, 아래 분류 카테고리 버튼을 눌러 조건별 탐색이 가능합니다.<br />
+        목록에서 질병을 클릭하면 상세 설명을 팝업으로 확인할 수 있습니다.
+      </p>
+
+      <p class="text-xs text-blue-500 mt-2">
+        ※ 정보는 의료 참고용이며, 정확한 진단은 전문의 상담을 권장합니다.
+      </p>
+    </div>
+
     <!-- HEADER / SEARCH / FILTER -->
     <div class="sticky top-0 bg-gray-50 pb-4 z-20">
       <h1 class="text-4xl font-bold text-sky-600 mb-6">
         📚 질병 백과사전
       </h1>
+
 
       <!-- 검색창 -->
       <input
@@ -168,7 +186,7 @@ export default {
   },
 
   methods: {
-    /** ▼ 필터 카테고리 스타일 지정 */
+    /**  필터 카테고리 스타일 지정 */
     categoryStyle(cat) {
       const colors = {
         "호흡기": "bg-blue-500 text-white border-blue-500",
@@ -208,13 +226,13 @@ export default {
       });
     },
 
-    /** ▼ 🔥 강화된 자동 카테고리 분류 */
+    /** ▼  강화된 자동 카테고리 분류 */
    autoCategory(name) {
   if (!name) return "기타";
   const n = name.toLowerCase();
 
   // -------------------------
-  // 🟦 호흡기(Respiratory)
+  // 호흡기(Respiratory)
   // -------------------------
   const respiratory = [
     "폐", "천식", "비염", "비루", "비인두", "호흡곤란", "기관지",
@@ -223,8 +241,8 @@ export default {
   if (respiratory.some(k => n.includes(k))) return "호흡기";
 
   // -------------------------
-  // 🟨 피부과(Dermatology)
-  // -------------------------
+  // 피부과(Dermatology)
+  // ------------------------
   const dermatology = [
     "피부", "습진", "두드러기", "아토피", "백선", "무좀", "진균",
     "농가진", "피부염", "건선", "피지", "모낭염"
@@ -232,7 +250,7 @@ export default {
   if (dermatology.some(k => n.includes(k))) return "피부과";
 
   // -------------------------
-  // 🟥 감염병(Infectious)
+  // 감염병(Infectious)
   // -------------------------
   const infectious = [
     "감염", "염증", "바이러스", "세균", "패혈증", "간염", "헤르페스",
@@ -241,7 +259,7 @@ export default {
   if (infectious.some(k => n.includes(k))) return "감염병";
 
   // -------------------------
-  // 🟩 소아과(Pediatrics)
+  // 소아과(Pediatrics)
   // -------------------------
   const pediatric = [
     "소아", "열성", "영아", "영유아", "신생아", "소아기", "소아과",
@@ -250,7 +268,7 @@ export default {
   if (pediatric.some(k => n.includes(k))) return "소아과";
 
   // -------------------------
-  // 🟧 소화기(Digestive)
+  // 소화기(Digestive)
   // -------------------------
   const digestive = [
     "위", "장", "식도", "간", "담낭", "담도", "간성", "췌장",
@@ -259,7 +277,7 @@ export default {
   if (digestive.some(k => n.includes(k))) return "소화기";
 
   // -------------------------
-  // 🟪 신경계(Neurology)
+  // 신경계(Neurology)
   // -------------------------
   const neurology = [
     "뇌", "신경", "경련", "발작", "뇌증", "신경병증", "말초신경",
@@ -268,7 +286,7 @@ export default {
   if (neurology.some(k => n.includes(k))) return "신경계";
 
   // -------------------------
-  // ❤️ 순환기(Cardiovascular)
+  //순환기(Cardiovascular)
   // -------------------------
   const cardio = [
     "심장", "심부전", "협심증", "부정맥", "심근", "동맥", "혈관",
@@ -277,7 +295,7 @@ export default {
   if (cardio.some(k => n.includes(k))) return "순환기";
 
   // -------------------------
-  // 💙 내분비·대사(Endocrine / Metabolism)
+  // 내분비·대사
   // -------------------------
   const endocrine = [
     "당뇨", "갑상선", "부신", "호르몬", "대사", "지방", "비만",
@@ -286,7 +304,7 @@ export default {
   if (endocrine.some(k => n.includes(k))) return "내분비";
 
   // -------------------------
-  // 💛 외상·정형외과(Trauma / Orthopedic)
+  // 외상·정형외과
   // -------------------------
   const ortho = [
     "골절", "탈구", "염좌", "무릎", "척추", "디스크",

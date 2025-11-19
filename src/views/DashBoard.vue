@@ -35,7 +35,7 @@
           </router-link>
 
           <router-link
-            to="/dashboard/qna"
+            to="/dashboard/board-list"
             class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
           >
             💬 실시간 Q&A

@@ -1,6 +1,24 @@
 <template>
   <div class="w-full relative">
 
+    <!-- ⭐ 지도 안내 박스 -->
+    <div class="p-4 mb-4 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
+      <h2 class="text-lg font-bold text-blue-800 flex items-center gap-2">
+        🗺️ 병원 검색 안내
+      </h2>
+
+      <p class="text-blue-700 mt-1 leading-relaxed">
+        이 페이지에서는 <strong>전국 병원을 지도 기반으로 검색</strong>할 수 있습니다.<br>
+        상단 검색창에서 <strong>병원명, 지역, 증상</strong>으로 검색하거나,<br>
+        아래 버튼을 통해 <strong>지역별 · 진료과별 필터링</strong>이 가능합니다.<br>
+        병원 마커를 클릭하면 오른쪽에서 상세 정보를 확인할 수 있습니다.
+      </p>
+
+      <p class="text-xs text-blue-500 mt-2">
+        ※ 제공되는 정보는 참고용이며 실제 병원 운영 정보와 다를 수 있습니다.
+      </p>
+    </div>
+
     <!-- 🔍 검색 -->
     <div class="p-4 bg-white shadow-md flex items-center space-x-3 rounded-lg mb-4">
       <input
@@ -21,6 +39,7 @@
       >📍 현재위치</button>
     </div>
 
+
     <!-- 🏙 지역 버튼 -->
     <div class="flex flex-wrap gap-3 mb-4">
       <button class="px-4 py-2 bg-gray-300 rounded-lg" @click="resetArea">전체 지역</button>
@@ -37,10 +56,7 @@
 
     <!-- 🩺 진료과 버튼 -->
     <div class="flex flex-wrap gap-3 mb-4">
-      <button
-        class="px-4 py-2 bg-gray-300 rounded-lg"
-        @click="resetDepartment"
-      >전체 과목</button>
+      <button class="px-4 py-2 bg-gray-300 rounded-lg" @click="resetDepartment">전체 과목</button>
 
       <button
         v-for="dept in departments"
@@ -55,7 +71,7 @@
     <!-- 🗺 지도 -->
     <div id="map" class="rounded-lg shadow-md"></div>
 
-    <!-- ⭐ 지도 위 상세 패널 -->
+    <!-- ⭐ 오른쪽 병원 상세 패널 -->
     <div v-if="selectedHospital" class="hospital-panel">
       <button class="close-btn" @click="closePanel">✕</button>
 
@@ -79,6 +95,7 @@
 
   </div>
 </template>
+
 <script>
 /* global naver */
 import Supercluster from "supercluster";
@@ -102,8 +119,8 @@ export default {
 
       userPos: null,
 
+      /* 지역 버튼 */
       areas: ["서울", "경기", "인천", "부산", "대구", "대전", "광주", "울산", "제주"],
-
       areaCenters: {
         "서울": { lat: 37.5665, lng: 126.9780 },
         "경기": { lat: 37.4363, lng: 127.5500 },
@@ -116,6 +133,7 @@ export default {
         "제주": { lat: 33.4996, lng: 126.5312 },
       },
 
+      /* 진료과 버튼 */
       departments: [
         "이비인후과", "정형외과", "소아과", "내과",
         "외과", "피부과", "안과", "산부인과"
@@ -128,7 +146,7 @@ export default {
   },
 
   methods: {
-    /* -------------------- 지도 스크립트 -------------------- */
+    /* 네이버 지도 script 로드 */
     loadScript() {
       const script = document.createElement("script");
       script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.VUE_APP_NAVER_KEY_ID}`;
@@ -139,7 +157,7 @@ export default {
       document.head.appendChild(script);
     },
 
-    /* -------------------- 지도 초기화 -------------------- */
+    /* 지도 초기화 */
     initMap() {
       this.map = new naver.maps.Map("map", {
         center: new naver.maps.LatLng(37.5665, 126.978),
@@ -151,21 +169,24 @@ export default {
         this.map.setCenter(new naver.maps.LatLng(this.userPos.lat, this.userPos.lng));
       });
 
+      /* 디바운스 적용 */
+      let debounceTimer = null;
       naver.maps.Event.addListener(this.map, "idle", () => {
-        this.updateMarkers();
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          this.updateMarkers();
+        }, 200);
       });
     },
 
-    /* -------------------- 병원 데이터 로드 -------------------- */
+    /* 병원 데이터 */
     async loadHospitals() {
       const res = await fetch("/api/hospital/all");
       let data = await res.json();
 
-      // 좌표 + 상태Detail(정상/휴업)만 표시
       data = data.filter(
         (h) =>
-          h.x &&
-          h.y &&
+          h.x && h.y &&
           (h.statusDetail === "정상" || h.statusDetail === "휴업")
       );
 
@@ -175,7 +196,7 @@ export default {
       this.buildClusters();
     },
 
-    /* -------------------- 클러스터 구축 -------------------- */
+    /* 클러스터 생성 */
     buildClusters() {
       this.supercluster = new Supercluster({
         radius: 60,
@@ -189,62 +210,68 @@ export default {
       }));
 
       this.supercluster.load(points);
+
       this.updateMarkers();
     },
 
-    /* -------------------- 마커 업데이트 -------------------- */
+    /* 🔥 최종 안정화된 마커 업데이트 */
     updateMarkers() {
-  if (!this.supercluster || !this.map) return;
+      if (!this.map || !this.supercluster) return;
 
-  const zoom = this.map.getZoom();
-  const bounds = this.map.getBounds();
+      const zoom = this.map.getZoom();
+      const bounds = this.map.getBounds();
 
-  const clusters = this.supercluster.getClusters(
-    [
-      bounds.getMin().lng(),
-      bounds.getMin().lat(),
-      bounds.getMax().lng(),
-      bounds.getMax().lat(),
-    ],
-    zoom
-  );
+      this.clearMarkers();
 
-  this.clearMarkers();
+      const clusters = this.supercluster.getClusters(
+        [
+          bounds.getMin().lng(),
+          bounds.getMin().lat(),
+          bounds.getMax().lng(),
+          bounds.getMax().lat(),
+        ],
+        zoom
+      );
 
-  let hasCluster = false; // 📌 클러스터가 하나라도 있는지 체크
-
-  clusters.forEach((c) => {
-    if (c.properties.cluster) {
-      hasCluster = true;
-      this.createClusterMarker(c);
-    } else {
-      // 일반 마커는 클러스터가 없어야 보임
-      if (!hasCluster) {
-        this.createHospitalMarker(c.properties.hospital);
+      /* 1) 줌 13 이하 → 클러스터만 */
+      if (zoom <= 13) {
+        clusters.forEach(c => {
+          if (c.properties.cluster) this.createClusterMarker(c);
+        });
+        return;
       }
-    }
-  });
 
-  // ⭐ 상세 마커 표시 조건:
-  // 1) 선택된 병원 존재
-  // 2) 클러스터가 없어야 함
-  if (this.selectedHospital && !hasCluster) {
-    this.createHospitalMarker(this.selectedHospital, true);
-  }
-},
+      /* 2) 줌 14~15 → 클러스터 해체된 병원만 */
+      if (zoom >= 14 && zoom <= 15) {
+        clusters.forEach(c => {
+          if (!c.properties.cluster) this.createHospitalMarker(c.properties.hospital);
+        });
+        return;
+      }
 
+      /* 3) 줌 16 이상 → 지도 안의 모든 병원 표시 */
+      if (zoom >= 16) {
+        clusters.forEach(c => {
+          if (!c.properties.cluster) {
+            this.createHospitalMarker(c.properties.hospital);
+          }
+        });
 
-    /* -------------------- 병원 마커 -------------------- */
+        if (this.selectedHospital) {
+          this.createHospitalMarker(this.selectedHospital, true);
+        }
+
+        return;
+      }
+    },
+
+    /* 병원 마커 */
     createHospitalMarker(hospital, forceHighlight = false) {
-      const isHighlighted = forceHighlight || this.selectedHospital?.id === hospital.id;
+      const isHighlighted =
+        forceHighlight || this.selectedHospital?.id === hospital.id;
 
-      const color =
-        hospital.statusDetail === "정상"
-          ? "#00c73c"
-          : "#9e9e9e"; // 휴업 = 회색
-
+      const color = hospital.statusDetail === "정상" ? "#00c73c" : "#9e9e9e";
       const size = isHighlighted ? 46 : 28;
-      const border = isHighlighted ? "5px solid #1e90ff" : "3px solid white";
 
       const marker = new naver.maps.Marker({
         position: new naver.maps.LatLng(hospital.y, hospital.x),
@@ -257,21 +284,15 @@ export default {
               height:${size}px;
               background:${color};
               border-radius:50%;
-              border:${border};
-              transform: ${isHighlighted ? "scale(1.2)" : "scale(1)"};
-              transition: 0.2s ease;
+              border:3px solid white;
               box-shadow:0 2px 8px rgba(0,0,0,0.35);
+              transform:${isHighlighted ? "scale(1.2)" : "scale(1)"};
+              transition:0.2s ease;
             "></div>
           `,
           anchor: new naver.maps.Point(size / 2, size / 2),
         },
       });
-
-      // 기존 highlightMarker 삭제
-      if (isHighlighted) {
-        if (this.highlightMarker) this.highlightMarker.setMap(null);
-        this.highlightMarker = marker;
-      }
 
       marker.addListener("click", () => {
         this.selectedHospital = hospital;
@@ -280,34 +301,32 @@ export default {
       });
 
       if (!isHighlighted) this.markers.push(marker);
+      else this.highlightMarker = marker;
     },
 
-    /* -------------------- 클러스터 마커 -------------------- */
+    /* 클러스터 마커 */
     createClusterMarker(cluster) {
-      const { coordinates } = cluster.geometry;
-      const count = cluster.properties.point_count;
+      
+      const coords = cluster.geometry.coordinates;
 
       const marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(coordinates[1], coordinates[0]),
+        position: new naver.maps.LatLng(coords[1], coords[0]),
         map: this.map,
-        icon: {
-          content: `
-            <div style="
-              width: 42px;
-              height: 42px;
-              border-radius:50%;
-              background:#1e90ff;
-              color:white;
-              display:flex;
-              justify-content:center;
-              align-items:center;
-              font-weight:bold;
-              font-size:15px;
-              box-shadow:0 2px 6px rgba(0,0,0,0.25);
-            ">${count}</div>
-          `,
-          anchor: new naver.maps.Point(21, 21),
-        },
+         icon: {
+      content: `
+        <div style="
+          width:42px;
+          height:42px;
+          border-radius:50%;
+          background:#1e90ff;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          box-shadow:0 2px 6px rgba(0,0,0,0.25);
+        "></div>
+      `,
+      anchor: new naver.maps.Point(21, 21),
+    },
       });
 
       marker.addListener("click", () => {
@@ -321,14 +340,13 @@ export default {
       this.markers.push(marker);
     },
 
-    /* -------------------- 마커 초기화 -------------------- */
+    /* 마커 지우기 */
     clearMarkers() {
-      this.markers.forEach((m) => m.setMap(null));
+      this.markers.forEach(m => m.setMap(null));
       this.markers = [];
-      // highlightMarker는 삭제하지 않음
     },
 
-    /* -------------------- 필터 -------------------- */
+    /* 필터 */
     applyFilters() {
       let data = [...this.allData];
 
@@ -337,7 +355,7 @@ export default {
           (h) =>
             h.businessName.includes(this.keyword) ||
             h.address.includes(this.keyword) ||
-            h.department.includes(this.keyword)
+            h.department?.includes(this.keyword)
         );
       }
 
@@ -353,6 +371,7 @@ export default {
       this.buildClusters();
     },
 
+    /* 지역 이동 */
     selectArea(area) {
       this.selectedArea = area;
       this.moveToArea(area);
@@ -364,6 +383,7 @@ export default {
       this.applyFilters();
     },
 
+    /* 과목 이동 */
     selectDepartment(dept) {
       this.selectedDept = dept;
       this.applyFilters();
@@ -374,6 +394,7 @@ export default {
       this.applyFilters();
     },
 
+    /* 지도 이동 */
     moveToArea(area) {
       const pos = this.areaCenters[area];
       if (pos) {
@@ -385,9 +406,10 @@ export default {
     moveToUserLocation() {
       if (!this.userPos) return;
       this.map.setCenter(new naver.maps.LatLng(this.userPos.lat, this.userPos.lng));
-      this.map.setZoom(12);
+      this.map.setZoom(13);
     },
 
+    /* 패널 닫기 */
     closePanel() {
       this.selectedHospital = null;
       if (this.highlightMarker) this.highlightMarker.setMap(null);
@@ -397,6 +419,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 #map {
   width: 100%;
@@ -404,12 +427,12 @@ export default {
   border-radius: 12px;
 }
 
-/* 상세 패널 */
+/* 오른쪽 상세 패널 */
 .hospital-panel {
   position: fixed;
   top: 80px;
-  right: 25px;
-  width: 320px;
+  right: 20px;
+  width: 300px;
   max-height: 70vh;
   overflow-y: auto;
   background: white;
@@ -417,43 +440,26 @@ export default {
   padding: 20px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.25);
   z-index: 9999;
-  animation: slide-left 0.25s ease-out;
 }
 
 .close-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.55);
   width: 28px;
   height: 28px;
   border-radius: 50%;
   color: white;
   border: none;
-  cursor: pointer;
-}
-
-.title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
-
-.info {
-  margin-bottom: 6px;
-  color: #555;
 }
 
 .status-normal {
   color: #00c73c;
+  font-weight: bold;
 }
-
 .status-holiday {
   color: #ff9800;
-}
-
-@keyframes slide-left {
-  from { transform: translateX(40px); opacity: 0; }
-  to   { transform: translateX(0); opacity: 1; }
+  font-weight: bold;
 }
 </style>

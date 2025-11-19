@@ -1,5 +1,20 @@
 <template>
   <div class="chat-wrapper">
+
+    <!-- ⭐ 안내 박스 -->
+    <div class="guide-box">
+      <h2 class="guide-title">💬 AI 비대면 의료 상담 안내</h2>
+      <p class="guide-text">
+        이 페이지에서는 AI가 사용자의 증상을 분석하여 
+        <b>의심 질환 · 위험 신호 · 병원 방문 필요 여부</b>를 안내합니다.<br/>
+        증상을 직접 입력하거나, 상단의 빠른 선택 버튼을 사용해보세요.
+      </p>
+      <p class="guide-bottom">
+        ※ 응급 상황이 의심되면 자동으로 근처 병원을 추천해드립니다.
+      </p>
+    </div>
+
+    <!-- 기존 제목 -->
     <h1 class="title">AI 비대면 진료 상담</h1>
 
     <!-- 🔥 증상 카테고리 버튼 -->
@@ -48,7 +63,7 @@
       <button @click="sendMessage" class="send-btn">전송</button>
     </div>
 
-    <!-- 🔥 위험도 높음일 때 병원 추천 팝업 -->
+    <!-- 🔥 위험도 높음 → 병원 추천 -->
     <div v-if="showHospitalList" class="hospital-popup">
       <h3>⚠ 응급 위험 신호 감지 — 근처 병원 추천</h3>
 
@@ -64,6 +79,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from "axios";
@@ -369,4 +385,33 @@ ${hospitalAdvice}
   border-radius: 8px;
   cursor: pointer;
 }
+/* 안내 박스 UI */
+.guide-box {
+  background: #eef7ff;
+  border: 1px solid #b6d8ff;
+  padding: 15px 18px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 6px rgba(0, 102, 255, 0.08);
+}
+
+.guide-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0066cc;
+  margin-bottom: 6px;
+}
+
+.guide-text {
+  font-size: 14px;
+  color: #1e3a5f;
+  line-height: 1.4rem;
+}
+
+.guide-bottom {
+  font-size: 12px;
+  color: #0056a3;
+  margin-top: 6px;
+}
+
 </style>

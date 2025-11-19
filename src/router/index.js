@@ -7,7 +7,7 @@ import QnA from '@/views/QnA.vue';
 import AIChat from '@/views/AIChat.vue';
 import DiseaseEncyclopedia from '@/views/DiseaseEncyclopedia.vue';
 import UserInfo from '@/views/UserInfo.vue';
-import Board from '@/views/Board.vue';
+import BoardWrite from '@/views/BoardWrite.vue';
 import BoardList from '@/views/BoardList.vue';
 import BoardDetail from '@/views/BoardDetail.vue';
 import BookingList from '@/views/BookingList.vue';
@@ -32,6 +32,7 @@ const routes = [
   },
   {
     path: '/dashboard',
+     redirect: "/dashboard/home",
     component: Dashboard,
     children: [
       
@@ -42,7 +43,7 @@ const routes = [
       { path: 'ai-chat', name: 'AIChat', component: AIChat },
       { path: 'disease-encyclopedia', name: 'DiseaseEncyclopedia', component: DiseaseEncyclopedia },
       { path: 'user-info', name: 'UserInfo', component: UserInfo },
-      { path: 'board', name: 'Board', component: Board },
+      { path: 'board', name: 'BoardWrite', component: BoardWrite },
       { path: 'board-list', name: 'BoardList', component: BoardList },
       { path: 'board/:boardId', name: 'BoardDetail', component: BoardDetail },
       { path: 'history', name: 'DiagnosisHistory', component: DiagnosisHistory },
