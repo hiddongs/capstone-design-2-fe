@@ -10,9 +10,9 @@
           대시보드
         </h2>
 
-        <nav class="mt-10 space-y-3 text-lg">
+        <!-- ⭐ 기존 사용자(User) 메뉴 -->
+        <nav v-if="role === 'USER'" class="mt-10 space-y-3 text-lg">
 
-          <!-- 마이페이지 -->
           <router-link
             to="/dashboard/mypage"
             class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
@@ -62,14 +62,11 @@
               class="w-full text-left py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition flex justify-between items-center"
             >
               <span>💻 비대면 진료</span>
-              <span>{{ teleOpen ? "▲" : "▼" }}</span>
+              <span>{{ teleOpen ? '▲' : '▼' }}</span>
             </button>
 
             <transition name="slide">
-              <div
-                v-if="teleOpen"
-                class="ml-4 mt-2 space-y-2"
-              >
+              <div v-if="teleOpen" class="ml-4 mt-2 space-y-2">
                 <router-link
                   v-for="dept in departments"
                   :key="dept.name"
@@ -81,7 +78,49 @@
               </div>
             </transition>
           </div>
+
         </nav>
+
+        <!-- ⭐ 의사 메뉴(role === 'DOCTOR'일 때만 보임) -->
+        <nav v-if="role === 'DOCTOR'" class="mt-10 space-y-3 text-lg">
+
+          <router-link
+            to="/doctor/dashboard"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            🩺 의사 홈
+          </router-link>
+
+          <router-link
+            to="/doctor/reservations"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            📅 진료 예약 관리
+          </router-link>
+
+          <router-link
+            to="/doctor/triage"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            📝 문진 요청 보기
+          </router-link>
+
+          <router-link
+            to="/doctor/patients"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            👥 환자 목록
+          </router-link>
+
+          <router-link
+            to="/doctor/profile"
+            class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+          >
+            👨‍⚕️ 의사 정보
+          </router-link>
+
+        </nav>
+
       </aside>
 
       <!-- Main Content -->
@@ -101,21 +140,28 @@ export default {
   data() {
     return {
       teleOpen: false,
+      role: null,
       departments: [
-        { name: "내과", route: "/dashboard/telemedicine/internal" },
-        { name: "외과", route: "/dashboard/telemedicine/surgery" },
-        { name: "정형외과", route: "/dashboard/telemedicine/ortho" },
-        { name: "이비인후과", route: "/dashboard/telemedicine/ent" },
-        { name: "피부과", route: "/dashboard/telemedicine/dermatology" },
-        { name: "비뇨의학과", route: "/dashboard/telemedicine/urology" },
-        { name: "산부인과", route: "/dashboard/telemedicine/obstetrics" },
-        { name: "정신건강의학과", route: "/dashboard/telemedicine/mental" },
-        { name: "소아과", route: "/dashboard/telemedicine/pediatrics" },
-        { name: "안과", route: "/dashboard/telemedicine/ophthalmology" },
-        { name: "치과", route: "/dashboard/telemedicine/dentistry" },
-        { name: "신경과", route: "/dashboard/telemedicine/neurology" },
+        { name: "내과", route: "/dashboard/telemedicine/내과" },
+        { name: "피부과", route: "/dashboard/telemedicine/피부과" },
+        { name: "정형외과", route: "/dashboard/telemedicine/정형외과" },
+        { name: "이비인후과", route: "/dashboard/telemedicine/이비인후과" },
+        { name: "소아과", route: "/dashboard/telemedicine/소아과" },
+        { name: "산부인과", route: "/dashboard/telemedicine/산부인과" },
+        { name: "신경과", route: "/dashboard/telemedicine/신경과" },
+        { name: "비뇨의학과", route: "/dashboard/telemedicine/비뇨의학과" },
+        { name: "정신건강의학과", route: "/dashboard/telemedicine/정신건강의학과" },
+        { name: "안과", route: "/dashboard/telemedicine/안과" },
+        { name: "치과", route: "/dashboard/telemedicine/치과" }
       ],
     };
+  },
+  created() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    this.role = user?.role; // ROLE_USER / ROLE_DOCTOR / ROLE_ADMIN 저장되어 있을 것
+    if (this.role && this.role.startsWith("ROLE_")) {
+      this.role = this.role.replace("ROLE_", ""); // DOCTOR/USER 등으로 정리
+    }
   },
   methods: {
     toggleTele() {

@@ -72,26 +72,39 @@
     <div id="map" class="rounded-lg shadow-md"></div>
 
     <!-- ⭐ 오른쪽 병원 상세 패널 -->
-    <div v-if="selectedHospital" class="hospital-panel">
-      <button class="close-btn" @click="closePanel">✕</button>
+<div v-if="selectedHospital" class="hospital-panel">
 
-      <h2 class="title">{{ selectedHospital.businessName }}</h2>
+  <!-- 닫기 버튼 -->
+  <button class="close-btn" @click="closePanel">✕</button>
 
-      <p class="info">📍 {{ selectedHospital.address }}</p>
-      <p class="info">📞 {{ selectedHospital.phone || "정보 없음" }}</p>
-      <p class="info">🩺 {{ selectedHospital.department || "정보 없음" }}</p>
-      <p class="info">🏥 {{ selectedHospital.type }}</p>
+  <!-- 상태 뱃지 -->
+ <!-- 병원명 & 상태 뱃지를 같은 줄 -->
+<div class="title-row">
+  <h2 class="title">{{ selectedHospital.businessName }}</h2>
 
-      <p
-        class="status"
-        :class="{
-          'status-normal': selectedHospital.statusDetail === '정상',
-          'status-holiday': selectedHospital.statusDetail === '휴업'
-        }"
-      >
-        ● {{ selectedHospital.statusDetail }}
-      </p>
-    </div>
+</div>
+  <!-- 주요 정보 -->
+  <div class="info-list">
+    <p><span>📍</span>{{ selectedHospital.address }}</p>
+    <p><span>📞</span>{{ selectedHospital.phone || "정보 없음" }}</p>
+    <p><span>🩺</span>{{ selectedHospital.department || "정보 없음" }}</p>
+    
+    <p><span>🏥</span>{{ selectedHospital.type }}</p>
+  </div>
+<p class="status-info">
+  <span>
+    {{ selectedHospital.statusDetail === '정상' ? '🟢' : '🚫' }}
+  </span>
+  {{ selectedHospital.statusDetail }}
+</p>
+  <!-- 운영시간 카드 -->
+  <div class="op-card">
+    <h3>⏰ 운영시간</h3>
+    <p>{{ selectedHospital.operatingHours || "운영시간 정보 없음" }}</p>
+  </div>
+
+</div>
+
 
   </div>
 </template>
@@ -305,40 +318,47 @@ export default {
     },
 
     /* 클러스터 마커 */
-    createClusterMarker(cluster) {
-      
-      const coords = cluster.geometry.coordinates;
+    /* 클러스터 마커 */
+/* 클러스터 마커 */
+createClusterMarker(cluster) {
 
-      const marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(coords[1], coords[0]),
-        map: this.map,
-         icon: {
+  const coords = cluster.geometry.coordinates;
+
+  const marker = new naver.maps.Marker({
+    position: new naver.maps.LatLng(coords[1], coords[0]),
+    map: this.map,
+    icon: {
       content: `
         <div style="
-          width:42px;
-          height:42px;
-          border-radius:50%;
-          background:#1e90ff;
           display:flex;
           justify-content:center;
           align-items:center;
-          box-shadow:0 2px 6px rgba(0,0,0,0.25);
-        "></div>
+
+          width:22px;
+          height:22px;
+
+          border-radius:50%;
+          background:#4c8bf5;
+
+          box-shadow:0 1px 3px rgba(0,0,0,0.25);
+        ">
+        </div>
       `,
-      anchor: new naver.maps.Point(21, 21),
+      anchor: new naver.maps.Point(11, 11),
     },
-      });
+  });
 
-      marker.addListener("click", () => {
-        const zoom = this.supercluster.getClusterExpansionZoom(
-          cluster.properties.cluster_id
-        );
-        this.map.setZoom(zoom);
-        this.map.setCenter(marker.getPosition());
-      });
+  marker.addListener("click", () => {
+    const zoom = this.supercluster.getClusterExpansionZoom(
+      cluster.properties.cluster_id
+    );
+    this.map.setZoom(zoom);
+    this.map.setCenter(marker.getPosition());
+  });
 
-      this.markers.push(marker);
-    },
+  this.markers.push(marker);
+}
+,
 
     /* 마커 지우기 */
     clearMarkers() {
@@ -427,39 +447,132 @@ export default {
   border-radius: 12px;
 }
 
-/* 오른쪽 상세 패널 */
+/* 오른쪽 패널 */
 .hospital-panel {
   position: fixed;
   top: 80px;
   right: 20px;
-  width: 300px;
-  max-height: 70vh;
+  width: 320px;
+  max-height: 75vh;
   overflow-y: auto;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px 20px;
+
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
   z-index: 9999;
+  animation: fadeIn 0.25s ease;
+  font-family: 'Pretendard', sans-serif;
 }
 
+/* fade in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* 닫기 버튼 */
 .close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.55);
-  width: 28px;
-  height: 28px;
+  top: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.45);
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   color: white;
+  font-size: 16px;
   border: none;
+  cursor: pointer;
 }
 
-.status-normal {
-  color: #00c73c;
-  font-weight: bold;
+/* 병원명 + 상태 뱃지 라인 */
+.title-row {
+  display: flex;
+  align-items: flex-start; /* <-- 가장 중요! */
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
-.status-holiday {
-  color: #ff9800;
-  font-weight: bold;
+
+/* 병원명 */
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  line-height: 1.35;
+  margin: 0; /* 불필요한 margin 제거 */
+  padding-right: 10px;
+}
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 14.5px;
+  font-weight: 600;
+
+  color: #2ecc71; /* 기본 정상색 */
+}
+
+.status-info span {
+  font-size: 16px;
+}
+
+/* 휴업일 때 자동 색상 변경 */
+.status-info.holiday {
+  color: #e67e22;
+}
+
+
+.status-badge.normal {
+  background: #2ecc71;
+}
+
+.status-badge.holiday {
+  background: #f39c12;
+}
+
+/* 정보 리스트 */
+.info-list {
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+.info-list p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 14.5px;
+  color: #444;
+}
+
+.info-list span {
+  width: 20px;
+  font-size: 17px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* 운영시간 카드 */
+.op-card {
+  margin-top: 10px;
+  background: #f7faff;
+  padding: 14px 14px;
+  border-radius: 12px;
+  border: 1px solid #e3ebff;
+}
+
+.op-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #3b6fb8;
+  margin-bottom: 6px;
+}
+
+.op-card p {
+  font-size: 14px;
+  color: #444;
 }
 </style>

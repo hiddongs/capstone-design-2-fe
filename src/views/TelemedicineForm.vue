@@ -66,7 +66,6 @@
 </template>
 
 <script>
-import departments from "@/data/departments";
 
 export default {
   name: "TelemedicineForm",
@@ -94,9 +93,10 @@ export default {
   },
 
   computed: {
-    deptInfo() {
-      return departments[this.dept];
-    },
+  deptInfo() {
+  return { name: this.dept };
+},
+
 
     questions() {
       return this.baseQuestions;
@@ -158,7 +158,7 @@ export default {
       });
 
       const data = await response.json();
-
+sessionStorage.setItem("teleSummary", JSON.stringify(data));
       // 결과 페이지 이동
       this.$router.push({
         name: "TelemedicineResult",

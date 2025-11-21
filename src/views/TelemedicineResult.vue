@@ -24,8 +24,9 @@
 
     <button
       class="w-full py-4 bg-sky-600 text-white text-lg font-semibold rounded-lg"
+      @click="goToSelectDoctor"
     >
-      의사에게 제출하기 →
+      의사 선택하러 가기 →
     </button>
   </div>
 </template>
@@ -35,16 +36,34 @@ export default {
   name: "TelemedicineResult",
 
   data() {
-    return {
-      summary: history.state.summary,
-      aiSummary: history.state.summary.aiSummary || "요약 생성 중...",
-    };
-  },
+  const saved = sessionStorage.getItem("teleSummary");
+  const summary = saved ? JSON.parse(saved) : history.state.summary;
 
+  return {
+    summary,
+    aiSummary: summary.aiSummary || "요약 생성 중...",
+  };
+},
   computed: {
     formattedDate() {
       return new Date(this.summary.createdAt).toLocaleString();
     },
+  },
+
+  methods: {
+
+goToSelectDoctor() {
+
+
+this.$router.push(`/dashboard/telemedicine/select-doctor/${this.summary.triageId}`);
+
+
+}
+
+
+
+  
+    
   },
 };
 </script>
