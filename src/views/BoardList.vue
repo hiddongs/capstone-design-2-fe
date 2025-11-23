@@ -12,11 +12,10 @@
       </p>
     </div>
 
-    <!-- 페이지 헤더 -->
+    <!-- 페이지 헤더 + 글쓰기 -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-3xl font-bold text-gray-800">🩺 의료 상담 게시판</h1>
 
-      <!-- 글쓰기 버튼 -->
       <button 
         @click="goToWrite"
         class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">
@@ -24,68 +23,60 @@
       </button>
     </div>
 
+    <!-- 🔥 진료과 카테고리 -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <button 
+        v-for="dept in departments"
+        :key="dept"
+        @click="selectDept(dept)"
+        :class="[
+          'px-4 py-2 rounded-lg border transition',
+          selectedDept === dept 
+            ? 'bg-blue-600 text-white border-blue-700' 
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+        ]"
+      >
+        {{ dept }}
+      </button>
+
+      <!-- 전체 보기 버튼 -->
+      <button 
+        @click="selectDept('전체')"
+        :class="[
+          'px-4 py-2 rounded-lg border transition',
+          selectedDept === '전체'
+            ? 'bg-blue-600 text-white border-blue-700'
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+        ]"
+      >
+        전체
+      </button>
+    </div>
+
     <!-- 실제 게시글 목록 -->
-    <div v-if="boards.length" class="space-y-4">
-      <div v-for="board in boards" :key="board.id">
+    <div v-if="filteredBoards.length" class="space-y-4">
+      <div v-for="board in filteredBoards" :key="board.id">
         <router-link
           :to="'/dashboard/board/' + board.id"
           class="block p-5 bg-white rounded-xl shadow hover:shadow-lg transition border border-gray-200"
         >
-          <!-- 제목 -->
-          <p class="text-xl font-semibold text-blue-600">
-            {{ board.title }}
-          </p>
+          <p class="text-xl font-semibold text-blue-600">{{ board.title }}</p>
 
-          <!-- 작성자 / 날짜 -->
           <p class="text-sm text-gray-600 mt-1">
             ✍️ {{ board.writer }} · 📅 {{ formatDate(board.postedTime) }}
           </p>
 
-          <!-- 태그들 -->
           <div class="flex gap-2 mt-3">
             <span class="tag">{{ board.symptom }}</span>
-            <span class="tag bg-green-100 text-green-700 border-green-300">
-              {{ board.department }}
-            </span>
+            <span class="tag bg-green-100 text-green-700 border-green-300">{{ board.department }}</span>
           </div>
         </router-link>
       </div>
     </div>
 
-    <!-- 게시글이 없을 때 샘플 질문 표시 -->
-    <div v-else class="py-10 text-gray-600">
-
-      <p class="text-xl mb-3 text-center">📝 아직 등록된 상담 질문이 없어요!</p>
-      <p class="text-center mb-6">아래는 예시 질문입니다. 참고해서 첫 질문을 남겨보세요.</p>
-
-      <!-- 샘플 목록 -->
-      <div class="space-y-4">
-
-        <div class="p-5 bg-gray-100 text-gray-600 rounded-xl border border-gray-300 cursor-default">
-          <p class="font-semibold text-lg">“두통이 3일째 계속되는데 어떤 진료과를 가면 좋을까요?”</p>
-          <p class="text-sm mt-1">👤 익명 · 🏥 신경과</p>
-        </div>
-
-        <div class="p-5 bg-gray-100 text-gray-600 rounded-xl border border-gray-300 cursor-default">
-          <p class="font-semibold text-lg">“기침이 오래가고 가래가 같이 나오는데 폐렴일 수도 있나요?”</p>
-          <p class="text-sm mt-1">👤 익명 · 🏥 호흡기내과</p>
-        </div>
-
-        <div class="p-5 bg-gray-100 text-gray-600 rounded-xl border border-gray-300 cursor-default">
-          <p class="font-semibold text-lg">“음식만 먹으면 속이 쓰리고 메스꺼워요. 어떤 검사를 받아야 하나요?”</p>
-          <p class="text-sm mt-1">👤 익명 · 🏥 위장내과</p>
-        </div>
-
-      </div>
-
-      <div class="text-center mt-8">
-        <button 
-          @click="goToWrite" 
-          class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition">
-          ✏️ 첫 질문 작성하기
-        </button>
-      </div>
-
+    <!-- 게시글 없음 -->
+    <div v-else class="text-gray-600 py-10 text-center">
+      📝 선택한 진료과에 대한 질문이 없습니다!
     </div>
 
   </div>
@@ -97,12 +88,30 @@ import axios from "axios";
 export default {
   data() {
     return {
-      boards: []
+      boards: [],
+      selectedDept: "전체",
+
+      // 🔥 필터 사용할 진료과 목록
+      departments: [
+        "내과", "외과", "소아과", "정형외과", "안과", "이비인후과",
+        "신경과", "피부과", "비뇨의학과", "산부인과", "정신건강의학과"
+      ]
     };
   },
+
+  computed: {
+    filteredBoards() {
+      if (this.selectedDept === "전체") return this.boards;
+      return this.boards.filter(
+        b => b.department === this.selectedDept
+      );
+    }
+  },
+
   mounted() {
     this.loadBoardList();
   },
+
   methods: {
     loadBoardList() {
       axios
@@ -111,6 +120,10 @@ export default {
           this.boards = res.data.content;
         })
         .catch(error => console.error(error));
+    },
+
+    selectDept(dept) {
+      this.selectedDept = dept;
     },
 
     goToWrite() {

@@ -112,45 +112,98 @@ const routes = [
      /doctor 로 시작하는 모든 라우트
   --------------------------*/
   {
-    path: '/doctor',
-    redirect: '/doctor/dashboard',
-    component: () => import('@/views/doctor/DoctorLayout.vue'),
-    meta: { role: 'DOCTOR' }, // 권한 보호
+    path: "/doctor",
+    redirect: "/doctor/dashboard",
+    component: () => import("@/views/doctor/DoctorLayout.vue"),
+    meta: { role: "DOCTOR" },
+
     children: [
+      /* 기본 홈 */
       {
-        path: 'dashboard',
-        name: 'DoctorDashboard',
-        component: () => import('@/views/doctor/DoctorDashboard.vue'),
+        path: "dashboard",
+        name: "DoctorDashboard",
+        component: () => import("@/views/doctor/DoctorDashboard.vue"),
       },
+
+      /* 예약 */
       {
-        path: 'reservations',
-        name: 'DoctorReservations',
-        component: () => import('@/views/doctor/DoctorReservations.vue'),
+        path: "reservations",
+        name: "DoctorReservations",
+        component: () => import("@/views/doctor/DoctorReservations.vue"),
       },
+
+      /* 문진 리스트 */
       {
-        path: 'triage',
-        name: 'DoctorTriageList',
-        component: () => import('@/views/doctor/DoctorTriageList.vue'),
+        path: "triage",
+        name: "DoctorTriageList",
+        component: () => import("@/views/doctor/DoctorTriageList.vue"),
       },
+
       {
-        path: 'patient/:id',
-        name: 'DoctorPatientDetail',
-        component: () => import('@/views/doctor/DoctorPatientDetail.vue'),
+        path: "triage-detail/:triageId",
+        name: "DoctorTriageDetail",
+        component: () => import("@/views/doctor/DoctorTriageDetail.vue"),
         props: true,
       },
+
+      /* 답변 필요 질문 */
       {
-        path: 'profile',
-        name: 'DoctorProfile',
-        component: () => import('@/views/doctor/DoctorProfile.vue'),
+        path: "unanswered",
+        name: "DoctorUnanswered",
+        component: () => import("@/views/doctor/DoctorUnanswered.vue"),
+      },
+
+      /* ✔ 의사 전용: 게시글 상세 페이지 */
+      {
+        path: "board/:boardId",
+        name: "DoctorBoardDetail",
+        component: () => import("@/views/doctor/DoctorBoardDetail.vue"),
+        props: true,
+      },
+
+      /* 프로필 */
+      {
+        path: "profile",
+        name: "DoctorProfile",
+        component: () => import("@/views/doctor/DoctorProfile.vue"),
       },
       {
-  path: 'triage-detail/:triageId',
-  name: 'DoctorTriageDetail',
-  component: () => import('@/views/doctor/DoctorTriageDetail.vue'),
-  props: true,
-},
+  path: "qna-list",
+  name: "DoctorQnAList",
+  component: () => import("@/views/doctor/DoctorQnAList.vue"),
+}
+,
     ],
   },
+  {
+  path: "/admin",
+  component: () => import("@/views/admin/AdminLayout.vue"),
+  meta: { role: "ADMIN" },
+  redirect: "/admin/dashboard",
+  children: [
+    {
+      path: "dashboard",
+      name: "AdminDashboard",
+      component: () => import("@/views/admin/AdminDashboard.vue"),
+    },
+    {
+      path: "doctor-requests",
+      name: "AdminDoctorRequests",
+      component: () => import("@/views/admin/AdminDoctorRequests.vue"),
+    },
+    {
+      path: "users",
+      name: "AdminUsers",
+      component: () => import("@/views/admin/AdminUsers.vue"),
+    },
+    {
+      path: "logs",
+      name: "AdminLogs",
+      component: () => import("@/views/admin/AdminLogs.vue"),
+    },
+  ],
+}
+
 
 ];
 
@@ -182,7 +235,12 @@ router.beforeEach((to, from, next) => {
       return next('/dashboard/home');
     }
   }
-
+ if (to.meta.role === "ADMIN") {
+    if (!user || user.role !== "ROLE_ADMIN") {
+      alert("관리자 전용 페이지입니다.");
+      return next("/");
+    }
+  }
   next();
 });
 

@@ -18,7 +18,7 @@
       👨‍⚕️ 의사 대시보드
     </h1>
 
-    <!-- 상단 카드 3개 -->
+    <!-- 상단 카드 -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <div class="bg-white shadow-md rounded-xl p-6 border border-gray-100">
         <div class="text-xl font-semibold text-gray-700 mb-2">오늘 예약</div>
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <!-- 최근 문진 요청 리스트 -->
+    <!-- 최근 문진 요청 -->
     <div class="bg-white shadow-md rounded-xl p-6 border border-gray-100">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold text-gray-800">📋 최근 문진 요청</h2>
@@ -78,9 +78,40 @@
       </div>
     </div>
 
-    <!-- 빠른 이동 버튼 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+    <!-- ⭐ 새로 추가한 “답변 필요한 질문” 섹션 -->
+    <div class="bg-white shadow-md rounded-xl p-6 border border-gray-100 mt-10">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">💬 답변이 필요한 질문</h2>
 
+        <router-link
+          to="/doctor/unanswered"
+          class="text-sky-600 hover:underline font-semibold"
+        >
+          전체보기 →
+        </router-link>
+      </div>
+
+      <div v-if="unansweredBoards.length === 0" class="text-gray-500">
+        현재 답변 대기 중인 질문이 없습니다.
+      </div>
+
+      <div v-else class="space-y-4">
+        <div
+          v-for="b in unansweredBoards"
+          :key="b.id"
+          class="p-4 bg-gray-50 rounded-xl border hover:bg-gray-100 cursor-pointer"
+          @click="openBoard(b.id)"
+        >
+          <p class="font-bold text-gray-800">{{ b.title }}</p>
+          <p class="text-sm text-gray-600 mt-1">
+            🏥 {{ b.department }} · {{ b.symptom }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 빠른 이동 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
       <router-link
         to="/doctor/reservations"
         class="block text-center bg-sky-500 text-white py-4 rounded-xl text-lg font-semibold hover:bg-sky-600 transition"
@@ -101,7 +132,6 @@
       >
         👥 환자 목록
       </router-link>
-
     </div>
   </div>
 </template>
@@ -121,7 +151,8 @@ export default {
       triageCount: 0,
       patientCount: 0,
 
-      recentTriage: []
+      recentTriage: [],
+      unansweredBoards: [] // ⭐ 추가
     };
   },
 
@@ -134,6 +165,7 @@ export default {
 
     await this.fetchCounts();
     await this.fetchRecentTriage();
+    await this.fetchUnansweredBoards(); // ⭐ 추가
   },
 
   methods: {
@@ -163,8 +195,21 @@ export default {
       }
     },
 
+    async fetchUnansweredBoards() {
+      try {
+        const res = await axios.get(`/api/doctor/${this.doctorId}/unanswered-boards`);
+        this.unansweredBoards = res.data;
+      } catch (e) {
+        console.error("Unanswered boards error:", e);
+      }
+    },
+
     goTriageDetail(id) {
       this.$router.push(`/doctor/triage-detail/${id}`);
+    },
+
+    openBoard(boardId) {
+      this.$router.push(`/doctor/board/${boardId}`);
     },
 
     formatDate(dt) {
@@ -176,5 +221,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

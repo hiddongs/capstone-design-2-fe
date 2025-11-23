@@ -3,6 +3,7 @@
     <h1 class="text-2xl font-bold text-sky-600 mb-6">👨‍⚕️ 의사 전환 신청</h1>
 
     <div class="space-y-4">
+
       <!-- 면허번호 -->
       <div>
         <label class="block text-gray-700 mb-1">의사 면허번호</label>
@@ -25,10 +26,18 @@
         />
       </div>
 
-      <!-- 파일 업로드 -->
+      <!-- 진료과 선택 -->
       <div>
-        <label class="block text-gray-700 mb-1">의사 면허증 사진</label>
-        <input type="file" @change="onFileChange" class="w-full border p-2 rounded" />
+        <label class="block text-gray-700 mb-1">진료과</label>
+        <select
+          v-model="selectedDept"
+          class="w-full border rounded p-2"
+        >
+          <option value="" disabled>진료과를 선택하세요</option>
+          <option v-for="dept in departments" :key="dept" :value="dept">
+            {{ dept }}
+          </option>
+        </select>
       </div>
 
       <button
@@ -44,7 +53,7 @@
       {{ message }}
     </p>
 
-    <!-- 🚨 경고 모달 -->
+    <!-- 경고 모달 -->
     <div
       v-if="showWarning"
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40"
@@ -88,38 +97,39 @@ export default {
     return {
       licenseNumber: "",
       hospitalName: "",
-      file: null,
+      selectedDept: "",
       message: "",
       messageColor: "text-green-600",
       showWarning: false,
+
+      departments: [
+        "내과", "외과", "정형외과", "신경과", "신경외과",
+        "안과", "피부과", "비뇨의학과", "이비인후과", "산부인과",
+        "소아청소년과", "가정의학과", "응급의학과",
+      ],
     };
   },
 
   methods: {
-    onFileChange(e) {
-      this.file = e.target.files[0];
-    },
-
-    // 🔥 신청 버튼 누르면 먼저 경고 모달 표시
     openWarningModal() {
-      if (!this.licenseNumber || !this.hospitalName || !this.file) {
+      if (!this.licenseNumber || !this.hospitalName || !this.selectedDept) {
         this.messageColor = "text-red-600";
-        this.message = "모든 정보를 입력하고 파일을 첨부해주세요.";
+        this.message = "모든 정보를 입력해주세요.";
         return;
       }
       this.showWarning = true;
     },
 
-    // 🔥 실제 제출
     async submitApplication() {
       this.showWarning = false;
 
       const userId = localStorage.getItem("userId");
       const formData = new FormData();
+
       formData.append("userId", userId);
       formData.append("licenseNumber", this.licenseNumber);
       formData.append("hospitalName", this.hospitalName);
-      formData.append("file", this.file);
+      formData.append("department", this.selectedDept);
 
       try {
         await fetch("http://localhost:8080/api/doctor-apply/apply", {

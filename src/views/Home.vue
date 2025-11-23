@@ -14,31 +14,53 @@
       <div class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70"></div>
 
       <!-- Text -->
-      <div
-        class="relative z-10 text-center max-w-3xl px-6"
-        data-aos="fade-up"
-      >
-        <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-xl leading-tight">
-          AI 비대면 진료 서비스
-        </h1>
+      <div class="relative z-10 text-center max-w-3xl px-6" data-aos="fade-up">
 
-        <p class="text-xl text-gray-200 mt-6">
-          인공지능 기반 실시간 분석과 전문 의사의 검진을 한 곳에서
-        </p>
+        <!-- 로그인 X 상태 -->
+        <template v-if="!isLoggedIn">
+          <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-xl leading-tight">
+            AI 비대면 진료 서비스
+          </h1>
 
-        <div class="mt-10 flex justify-center space-x-4">
-          <router-link to="/login">
-            <button class="px-8 py-3 text-lg bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-xl transition">
-              로그인
-            </button>
-          </router-link>
+          <p class="text-xl text-gray-200 mt-6">
+            인공지능 기반 실시간 분석과 전문 의사의 검진을 한 곳에서
+          </p>
 
-          <router-link to="/signup">
-            <button class="px-8 py-3 text-lg bg-white/90 backdrop-blur text-sky-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition shadow">
-              회원가입
-            </button>
-          </router-link>
-        </div>
+          <div class="mt-10 flex justify-center space-x-4">
+            <router-link to="/login">
+              <button class="px-8 py-3 text-lg bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-xl transition">
+                로그인
+              </button>
+            </router-link>
+
+            <router-link to="/signup">
+              <button class="px-8 py-3 text-lg bg-white/90 backdrop-blur text-sky-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition shadow">
+                회원가입
+              </button>
+            </router-link>
+          </div>
+        </template>
+
+        <!-- 로그인 O 상태 - 사용자/의사 별로 문구 다르게 -->
+        <template v-else>
+          <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-xl leading-tight">
+            {{ role === 'ROLE_DOCTOR' ? '의사님 환영합니다' : '다시 오신 걸 환영합니다' }}
+          </h1>
+
+          <p class="text-xl text-gray-200 mt-6">
+            {{ role === 'ROLE_DOCTOR' 
+              ? '환자들의 상담을 빠르고 정확하게 도와주세요.' 
+              : 'AI 분석과 맞춤형 의료 서비스를 계속 이용해보세요.' }}
+          </p>
+
+          <div class="mt-10 flex justify-center space-x-4">
+            <router-link :to="dashboardLink">
+              <button class="px-8 py-3 text-lg bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-xl transition">
+                대시보드로 이동 →
+              </button>
+            </router-link>
+          </div>
+        </template>
       </div>
 
     </section>
@@ -55,8 +77,6 @@
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-
-        <!-- Feature Card -->
         <div
           v-for="(f, index) in features"
           :key="index"
@@ -68,7 +88,6 @@
           <h3 class="text-2xl font-semibold text-gray-700 text-center mb-2">{{ f.title }}</h3>
           <p class="text-gray-600 text-center">{{ f.desc }}</p>
         </div>
-
       </div>
     </section>
 
@@ -76,7 +95,9 @@
     <!-- Stats Section -->
     <section class="bg-gradient-to-r from-sky-500 to-blue-600 text-white py-24">
       <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-4xl font-bold text-center mb-14" data-aos="fade-up">서비스 성과</h2>
+        <h2 class="text-4xl font-bold text-center mb-14" data-aos="fade-up">
+          서비스 성과
+        </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
           <div
@@ -101,7 +122,6 @@
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-
         <div
           v-for="(r, index) in reviews"
           :key="index"
@@ -113,7 +133,6 @@
           <p class="text-gray-600 italic">“{{ r.text }}”</p>
           <p class="mt-4 font-semibold">{{ r.name }}</p>
         </div>
-
       </div>
     </section>
 
@@ -125,12 +144,15 @@
         병원 갈 시간이 부족한 현대인을 위한 의료 서비스
       </p>
 
-      <router-link to="/signup">
-        <button
-          class="px-12 py-4 bg-sky-500 hover:bg-sky-600 rounded-xl text-lg font-semibold shadow-xl transition"
-          data-aos="zoom-in"
-        >
+      <router-link to="/signup" v-if="!isLoggedIn">
+        <button class="px-12 py-4 bg-sky-500 hover:bg-sky-600 rounded-xl text-lg font-semibold shadow-xl transition" data-aos="zoom-in">
           회원가입 →
+        </button>
+      </router-link>
+
+      <router-link :to="dashboardLink" v-else>
+        <button class="px-12 py-4 bg-sky-500 hover:bg-sky-600 rounded-xl text-lg font-semibold shadow-xl transition" data-aos="zoom-in">
+          대시보드로 이동 →
         </button>
       </router-link>
     </section>
@@ -145,16 +167,12 @@ import "aos/dist/aos.css";
 export default {
   name: "Home",
 
-  mounted() {
-    AOS.init({
-      duration: 800,
-      easing: "ease-out-quart",
-      once: true,
-    });
-  },
-
   data() {
     return {
+      isLoggedIn: false,
+      role: null,
+      dashboardLink: "/",
+
       heroImage: require("@/assets/medi.jpg"),
 
       features: [
@@ -199,6 +217,25 @@ export default {
         },
       ],
     };
+  },
+
+  created() {
+    // 로그인 여부 및 역할 가져오기
+    this.isLoggedIn = !!localStorage.getItem("accessToken");
+    this.role = localStorage.getItem("role");
+
+    // 역할에 따라 대시보드 경로 지정
+    if (this.role === "ROLE_DOCTOR") {
+      this.dashboardLink = "/doctor/dashboard";
+    } else if (this.role === "ROLE_USER") {
+      this.dashboardLink = "/dashboard/home";
+    }
+
+    AOS.init({
+      duration: 800,
+      easing: "ease-out-quart",
+      once: true,
+    });
   },
 };
 </script>

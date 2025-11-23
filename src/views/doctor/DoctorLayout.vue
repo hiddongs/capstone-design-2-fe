@@ -30,6 +30,20 @@
           📝 문진 요청
         </router-link>
 
+        <!-- ⭐ 새로 추가하는 메뉴 -->
+        <router-link
+          to="/doctor/unanswered"
+          class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+        >
+          💬 상담 답변하기
+        </router-link>
+       <router-link
+  to="/doctor/qna-list"
+  class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
+>
+  📚 전체 상담 목록
+</router-link>
+
         <router-link
           to="/doctor/profile"
           class="block py-3 px-5 rounded-xl hover:bg-sky-500 hover:text-white transition"
@@ -53,5 +67,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

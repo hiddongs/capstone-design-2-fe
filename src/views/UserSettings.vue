@@ -44,6 +44,13 @@
       </button>
     </div>
 
+    <!-- ⭐ 의사 전환 버튼 추가 -->
+    <button
+      class="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+      @click="$router.push('/dashboard/doctor-apply')"
+    >
+      👨‍⚕️ 의사 전환 신청하기
+    </button>
     <button
       class="mt-4 text-gray-600 underline"
       @click="$router.push('/dashboard/mypage')"

@@ -1,10 +1,10 @@
 <template>
-  <div class="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl shadow">
+  <div class="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
 
     <!-- 돌아가기 버튼 -->
-    <button @click="$router.push('/dashboard/board-list')" 
-      class="text-blue-600 hover:underline mb-4">
-      ← 목록으로 돌아가기
+    <button @click="$router.push('/doctor/unanswered')" 
+      class="text-sky-600 hover:underline mb-4">
+      ← 답변 목록으로 돌아가기
     </button>
 
     <!-- 제목 -->
@@ -16,7 +16,7 @@
       {{ formatDate(board.postedTime) }}
     </p>
 
-    <!-- 증상 / 진료과 -->
+    <!-- 태그 -->
     <div class="flex gap-2 mt-3">
       <span class="tag">{{ board.symptom }}</span>
       <span class="tag bg-green-100 text-green-700 border-green-300">
@@ -31,9 +31,9 @@
 
     <hr class="my-6">
 
-    <!-- 💬 의사 답변 리스트 -->
+    <!-- 💬 기존 의사 답변 -->
     <div>
-      <h2 class="text-xl font-bold mb-4">💬 의사 답변</h2>
+      <h2 class="text-xl font-bold mb-4">💬 기존 의사 답변</h2>
 
       <div v-if="answers.length" class="space-y-4">
         <div
@@ -49,12 +49,12 @@
         </div>
       </div>
 
-      <p v-else class="text-gray-500">아직 등록된 의사 답변이 없습니다.</p>
+      <p v-else class="text-gray-500">아직 답변이 등록되지 않았습니다.</p>
     </div>
 
-    <!-- 의사일 때만 답변 입력창 표시 -->
-    <div v-if="isDoctor" class="mt-8">
-      <h3 class="text-lg font-semibold mb-2">🩺 의사 답변 작성</h3>
+    <!-- 의사 답변 작성 -->
+    <div class="mt-8">
+      <h3 class="text-lg font-semibold mb-2">🩺 답변 작성</h3>
 
       <textarea
         v-model="answerContent"
@@ -64,7 +64,7 @@
 
       <button
         @click="submitAnswer"
-        class="mt-3 w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        class="mt-3 w-full py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
         답변 등록하기
       </button>
     </div>
@@ -93,46 +93,52 @@ export default {
   },
 
   methods: {
+
+    /** 게시글 내용 */
     loadBoard(id) {
       axios.get(`http://localhost:8080/api/boards/${id}`)
         .then(res => this.board = res.data)
         .catch(err => console.error(err));
     },
 
+    /** 🔥 댓글(=답변) 불러오기 - 수정됨 */
     loadAnswers(id) {
-  axios.get(`http://localhost:8080/api/doctor/board/${id}`)
-    .then(res => this.answers = res.data)
-    .catch(err => console.error(err));
-},
+      axios.get(`http://localhost:8080/api/doctor/board/${id}`)
+        .then(res => this.answers = res.data)
+        .catch(err => console.error(err));
+    },
 
-
+    /** 의사 권한 체크 */
     checkDoctorRole() {
       axios.get("http://localhost:8080/api/auth/me", {
         headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
       })
       .then(res => {
-        this.isDoctor = res.data.role === "DOCTOR" || res.data.role === "ADMIN";
+        this.isDoctor = res.data.role === "ROLE_DOCTOR";
       })
       .catch(err => console.error(err));
     },
 
+    /** 🔥 의사 답변 등록 API - 완전 수정됨 */
     submitAnswer() {
       if (!this.answerContent.trim()) {
         alert("답변 내용을 입력해주세요.");
         return;
       }
 
-      const userId = localStorage.getItem("userId");
+      const user = JSON.parse(localStorage.getItem("user"));
+      const doctorId = user.id;
       const boardId = this.board.id;
 
-      axios.post(`http://localhost:8080/api/answers/${boardId}/${userId}`,
-        { content: this.answerContent },
+      axios.post(
+        `http://localhost:8080/api/doctor?userId=${doctorId}&boardId=${boardId}`,
+        { comment: this.answerContent },   // 🔥 DTO에 맞게 comment로 변경
         { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } }
       )
       .then(() => {
         alert("답변이 등록되었습니다.");
         this.answerContent = "";
-        this.loadAnswers(boardId);
+        this.loadAnswers(boardId);  // 🔥 새로 등록한 답변 다시 로딩
       })
       .catch(err => console.error(err));
     },
@@ -152,6 +158,5 @@ export default {
   font-size: 12px;
   border-radius: 6px;
   border: 1px solid #bbdefb;
-  display: inline-block;
 }
 </style>

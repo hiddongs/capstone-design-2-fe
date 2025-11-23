@@ -49,7 +49,14 @@
           >
             의사 대시보드
           </router-link>
-
+<router-link
+  v-if="isAdmin"
+  to="/admin/dashboard"
+  class="text-gray-700 font-medium hover:text-sky-600 transition"
+  active-class="text-sky-600 font-semibold"
+>
+  관리자 대시보드
+</router-link>
           <!-- 로그인/로그아웃 -->
           <button
             v-if="isLoggedIn"
@@ -176,6 +183,9 @@ export default {
     isUser() {
       return this.role === "ROLE_USER";
     },
+      isAdmin() {
+    return this.role === "ROLE_ADMIN";  // 🔥 추가
+  }
   },
 
   methods: {

@@ -10,11 +10,10 @@
         증상을 직접 입력하거나, 상단의 빠른 선택 버튼을 사용해보세요.
       </p>
       <p class="guide-bottom">
-        ※ 응급 상황이 의심되면 자동으로 근처 병원을 추천해드립니다.
+        ※ 해당 정보는 의학적 참고용이며, 응급 상황 시 119를 이용해주세요.
       </p>
     </div>
 
-    <!-- 기존 제목 -->
     <h1 class="title">AI 비대면 진료 상담</h1>
 
     <!-- 🔥 증상 카테고리 버튼 -->
@@ -33,10 +32,7 @@
     <div ref="chatContainer" class="chat-container">
       <div v-for="message in chatMessages" :key="message.id" class="chat-row">
         <div
-          :class="[
-            'chat-bubble',
-            message.sender === 'AI' ? 'ai-bubble' : 'user-bubble'
-          ]"
+          :class="['chat-bubble', message.sender === 'AI' ? 'ai-bubble' : 'user-bubble']"
           :style="message.sender === 'AI' ? severityStyle(message.severityLevel) : {}"
         >
           <p class="sender-name">{{ message.sender }}</p>
@@ -63,23 +59,8 @@
       <button @click="sendMessage" class="send-btn">전송</button>
     </div>
 
-    <!-- 🔥 위험도 높음 → 병원 추천 -->
-    <div v-if="showHospitalList" class="hospital-popup">
-      <h3>⚠ 응급 위험 신호 감지 — 근처 병원 추천</h3>
-
-      <ul class="hospital-list">
-        <li v-for="(h, idx) in hospitals" :key="idx" class="hospital-item">
-          <div class="hospital-name">{{ h.name }}</div>
-          <div class="hospital-address">{{ h.address }}</div>
-          <div class="hospital-phone">{{ h.telephone || "전화번호 없음" }}</div>
-        </li>
-      </ul>
-
-      <button class="close-btn" @click="showHospitalList = false">닫기</button>
-    </div>
   </div>
 </template>
-
 
 <script>
 import axios from "axios";
@@ -97,8 +78,6 @@ export default {
       ],
       newMessage: "",
       loading: false,
-      showHospitalList: false,
-      hospitals: [],
 
       // 🔥 자동 입력 버튼
       categories: [
@@ -151,44 +130,40 @@ export default {
       this.loading = true;
 
       try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const userId = user?.id;
+
+        if (!userId) {
+          alert("로그인이 필요합니다.");
+          return;
+        }
+
         // 🔥 진단 API 요청
         const res = await axios.post(
           "http://localhost:8080/api/v1/diagnosis/complete",
           null,
-          { params: { userId: 1, symptom: userMsg } }
+          { params: { userId, symptom: userMsg } }
         );
 
         const ai = res.data.ai;
         const risk = res.data.severityLevel;
         const score = res.data.severityScore;
 
-        const suspected = ai.suspectedDiseases?.join(", ") || "없음";
-        const danger = ai.dangerSignals?.join(", ") || "없음";
-        const keywords = ai.extractedKeywords?.join(", ") || "없음";
-        const recommendations = ai.recommendations || "추천 정보 없음";
-        const hospitalAdvice = ai.hospitalAdvice || "안내 없음";
-
-        // 🔥 AI 메시지 (확장 버전)
         const aiMsg = `
-📌 <b>의심 질환:</b> ${suspected}
-⚠ <b>위험 신호:</b> ${danger}
-🔑 <b>추출된 주요 키워드:</b> ${keywords}
+📌 <b>의심 질환:</b> ${ai.suspectedDiseases?.join(", ") || "없음"}
+⚠ <b>위험 신호:</b> ${ai.dangerSignals?.join(", ") || "없음"}
+🔑 <b>추출된 키워드:</b> ${ai.extractedKeywords?.join(", ") || "없음"}
 
 🩺 <b>응급도:</b> ${risk} (점수: ${score})
 
 💡 <b>AI 조언</b>  
-${recommendations}
+${ai.recommendations || "추천 정보 없음"}
 
 🏥 <b>병원 권고</b>  
-${hospitalAdvice}
+${ai.hospitalAdvice || "없음"}
 `;
 
-        // 위험도 높음 → 병원 추천
-        if (risk === "높음") {
-          this.fetchNearbyHospitals();
-        }
-
-        // AI 메시지 추가
+        // 🔥 AI 응답 추가
         this.chatMessages.push({
           id: Date.now(),
           sender: "AI",
@@ -201,26 +176,12 @@ ${hospitalAdvice}
         this.scrollToBottom();
       }
     },
-
-    // 🔥 병원 추천 API
-    async fetchNearbyHospitals() {
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-
-        const res = await axios.get(
-          `http://localhost:8081/api/v1/diagnosis/hospitals?lat=${lat}&lng=${lng}`
-        );
-
-        this.hospitals = res.data;
-        this.showHospitalList = true;
-      });
-    },
   },
 };
 </script>
 
 <style scoped>
+/* --- 스타일 그대로 유지 --- */
 .chat-wrapper {
   width: 100%;
   max-width: 900px;
@@ -353,38 +314,6 @@ ${hospitalAdvice}
   }
 }
 
-/* 병원 추천 팝업 */
-.hospital-popup {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
-  margin-top: 20px;
-}
-
-.hospital-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.hospital-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #ddd;
-}
-
-.hospital-name {
-  font-weight: 700;
-}
-
-.close-btn {
-  margin-top: 12px;
-  padding: 10px;
-  background: #007bff;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-}
 /* 안내 박스 UI */
 .guide-box {
   background: #eef7ff;
@@ -413,5 +342,4 @@ ${hospitalAdvice}
   color: #0056a3;
   margin-top: 6px;
 }
-
 </style>
