@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-6xl mx-auto py-10 px-4">
 
-    <!-- ⭐ 안내 박스 -->
+    <!-- 안내 박스 -->
     <div class="mb-6 p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
       <h2 class="text-xl font-bold text-blue-700 flex items-center gap-2">
         📘 질병 백과사전 안내

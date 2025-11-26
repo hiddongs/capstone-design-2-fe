@@ -67,13 +67,13 @@ export default {
     try {
       const doctorId = this.$route.params.doctorId;
 
-      // 🟦 시간 슬롯 가져오기
+      // 시간 슬롯 가져오기
       const res = await fetch(
         `http://localhost:8080/api/reservation/slots/doctor/${doctorId}`
       );
       this.slots = await res.json();
 
-      // 🟩 의사 정보 가져오기
+      //  의사 정보 가져오기
       const doctorRes = await fetch(
         `http://localhost:8080/api/doctor/${doctorId}`
       );

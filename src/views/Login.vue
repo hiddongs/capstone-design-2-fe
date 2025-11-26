@@ -74,7 +74,7 @@ export default {
 
   methods: {
     async login() {
-      // 🔥 여기서 보내는 데이터를 먼저 확인
+      //  보내는 데이터를 먼저 확인
       const loginData = {
         username: this.username,
         password: this.password,

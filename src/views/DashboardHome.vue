@@ -112,7 +112,7 @@ export default {
         {
           title: "비대면 상담",
           desc: "전문의와 실시간 상담을 받아보세요.",
-          link: "/dashboard/qna",
+          link: "/dashboard/board-list",
           action: "상담하기",
         },
       ],

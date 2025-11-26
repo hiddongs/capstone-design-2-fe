@@ -24,7 +24,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      history: [],   // 🔥 반드시 추가
+      history: [],   // 반드시 추가
       userId: 1,     // 로그인 연동되면 변경
     };
   },
@@ -34,7 +34,7 @@ export default {
   },
 
   methods: {
-    // 🔥 기록 불러오기
+    // 기록 불러오기
     async fetchHistory() {
       try {
         const res = await axios.get(
@@ -47,7 +47,7 @@ export default {
       }
     },
 
-    // 🔥 날짜 포맷
+    // 날짜 포맷
     formatDate(dateStr) {
       if (!dateStr) return "-";
       const d = new Date(dateStr);
